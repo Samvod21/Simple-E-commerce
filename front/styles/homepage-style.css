@@ -103,22 +103,10 @@ body {
 .hero {
     background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #0284c7 100%);
     color: #ffffff;
-    padding: 2.25rem 2rem 3rem 2rem;
+    padding: 2.25rem 2rem;
     text-align: center;
     position: relative;
-    overflow: hidden;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 1rem;
-    background: #f3f4f6;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.15);
 }
 
 .hero-content h1 {
@@ -131,16 +119,15 @@ body {
 .hero-content p {
     font-size: 1.05rem;
     opacity: 0.92;
-    margin: 0;
-    max-width: 42rem;
     margin: 0 auto;
+    max-width: 42rem;
 }
 
 /* ---------- Main Layout & Dashboard Navbar ---------- */
 
 .main-content {
     max-width: 76rem;
-    margin: -1.5rem auto 3rem auto;
+    margin: 2rem auto 3rem auto;
     padding: 0 1.5rem;
     position: relative;
     z-index: 10;
@@ -241,9 +228,9 @@ body {
 }
 
 .card-header {
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
     border-bottom: 1px solid #f3f4f6;
-    padding-bottom: 1rem;
+    padding-bottom: 1.25rem;
 }
 
 .card-header.flex-header {
@@ -418,7 +405,7 @@ body {
     gap: 1rem;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.75rem;
     flex-wrap: wrap;
 }
 
@@ -676,8 +663,8 @@ body {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .modal-header h3 {
@@ -754,6 +741,16 @@ body {
 .text-muted { color: #6b7280; font-size: 0.825rem; }
 .text-xs { font-size: 0.75rem; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+.margin-top-xs { margin-top: 0.5rem !important; }
+.margin-top-sm { margin-top: 1rem !important; }
+.margin-top-md { margin-top: 1.5rem !important; }
+.margin-top-lg { margin-top: 2rem !important; }
+
+.margin-bottom-xs { margin-bottom: 0.5rem !important; }
+.margin-bottom-sm { margin-bottom: 1rem !important; }
+.margin-bottom-md { margin-bottom: 1.5rem !important; }
+.margin-bottom-lg { margin-bottom: 2rem !important; }
 
 .empty-state {
     text-align: center;
@@ -961,14 +958,22 @@ body {
     overflow: hidden;
 }
 
+.size-select-wrapper {
+    margin-top: 0.85rem;
+    margin-bottom: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
 .card-meta-box {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #f8fafc;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1rem;
     border-radius: 0.6rem;
-    margin-top: auto;
+    margin-top: 1.25rem;
     border: 1px solid #f1f5f9;
 }
 
@@ -1344,8 +1349,8 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     color: #0f172a;
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.75rem;
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.85rem;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -1412,9 +1417,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.85rem;
     border-bottom: 1px solid #f1f5f9;
-    margin-bottom: 0.85rem;
+    margin-bottom: 1.25rem;
 }
 
 .order-tracker-id {

@@ -91,13 +91,13 @@
                     <span>Manage Products</span>
                     <span class="tab-count-badge" id="product-count-badge">0</span>
                 </button>
-                <button class="dash-tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
+                <button class="dash-tab-btn" id="tab-btn-dash-orders" onclick="switchTab('dash-orders')">
                     <svg class="dash-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
                         <line x1="3" y1="6" x2="21" y2="6"/>
                         <path d="M16 10a4 4 0 0 1-8 0"/>
                     </svg>
-                    <span>Orders</span>
+                    <span>Manage Orders</span>
                     <span class="tab-count-badge warning" id="orders-count-badge">0</span>
                 </button>
             </div>
@@ -395,6 +395,88 @@
             </div>
         </section>
 
+        <!-- TAB DASH ORDERS: SELLER ORDERS MANAGEMENT -->
+        <section id="tab-dash-orders" class="dashboard-section tab-view">
+            <div class="section-card">
+                <div class="card-header flex-header">
+                    <div>
+                        <h2>Seller Orders Management</h2>
+                        <p class="section-subtitle">Manage customer orders placed on your products and update fulfillment status in real-time.</p>
+                    </div>
+                </div>
+
+                <!-- Metrics Summary Bar -->
+                <div class="order-metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Total Received</span>
+                        <span class="metric-value" id="metric-total-orders">0</span>
+                    </div>
+                    <div class="metric-card warning">
+                        <span class="metric-label">Action Required</span>
+                        <span class="metric-value" id="metric-pending-orders">0</span>
+                    </div>
+                    <div class="metric-card info">
+                        <span class="metric-label">In Transit / Processing</span>
+                        <span class="metric-value" id="metric-transit-orders">0</span>
+                    </div>
+                    <div class="metric-card success">
+                        <span class="metric-label">Total Revenue</span>
+                        <span class="metric-value" id="metric-total-revenue">₹0</span>
+                    </div>
+                </div>
+
+                <!-- Toolbar Filter -->
+                <div class="toolbar margin-top-lg">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="dash-order-search" class="search-input" placeholder="Search by Order ID, Customer, or Product..." oninput="renderDashOrders()">
+                    </div>
+
+                    <div class="filter-group">
+                        <select id="dash-order-filter-status" class="filter-select" title="Filter by order status" aria-label="Filter by order status" onchange="renderDashOrders()">
+                            <option value="ALL">All Order Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer Info</th>
+                                <th>Product Ordered</th>
+                                <th>Total Price</th>
+                                <th>Status Badge</th>
+                                <th>Update Order Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dash-orders-table-body">
+                            <!-- Injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="no-dash-orders-empty" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1"/>
+                    </svg>
+                    <h3>No orders matching filter</h3>
+                    <p>Try switching status filters or search parameters.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- TAB 3: STORE ORDERS (ORDER STATUS TRACKER) -->
         <section id="tab-orders" class="dashboard-section tab-view">
             <div class="section-card">
@@ -665,7 +747,7 @@
 
         // Tab Switching Logic
         function switchTab(tabName) {
-            const tabs = ['home', 'cart', 'create', 'manage', 'orders'];
+            const tabs = ['home', 'cart', 'create', 'manage', 'dash-orders', 'orders'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
                 const view = document.getElementById(`tab-${t}`);
@@ -717,6 +799,7 @@
                 if (heroTitle) heroTitle.textContent = 'Seller Management Portal';
                 if (heroSubtitle) heroSubtitle.textContent = 'Easily create products, manage your inventory, and fulfill customer orders.';
                 if (tabName === 'manage') renderProducts();
+                if (tabName === 'dash-orders') renderDashOrders();
             }
         }
 
@@ -798,9 +881,9 @@
                     const sizeList = p.sizes.split(',').map(s => s.trim()).filter(Boolean);
                     if (sizeList.length > 0) {
                         sizeSelectorHtml = `
-                            <div class="margin-top-xs">
+                            <div class="size-select-wrapper">
                                 <label for="size-select-${p.id}" class="card-meta-label">Select Size:</label>
-                                <select id="size-select-${p.id}" class="form-select text-sm margin-top-xs">
+                                <select id="size-select-${p.id}" class="form-select text-sm">
                                     ${sizeList.map(s => `<option value="${s}">${s}</option>`).join('')}
                                 </select>
                             </div>
@@ -823,7 +906,7 @@
                         
                         ${sizeSelectorHtml}
 
-                        <div class="card-meta-box margin-top-sm">
+                        <div class="card-meta-box">
                             <div class="card-price-info">
                                 <span class="card-meta-label">Price</span>
                                 <span class="card-price-val">₹${p.price.toLocaleString('en-IN')}</span>
@@ -1328,7 +1411,108 @@
             showToast(`Updated "${products[pIndex].title}" details.`);
         }
 
-        // Tab 3: Store Orders — Read-only Order Status Tracker
+        // Tab 3 (Dashboard): Seller Orders Management
+        function renderDashOrders() {
+            const tbody = document.getElementById('dash-orders-table-body');
+            const emptyState = document.getElementById('no-dash-orders-empty');
+            const searchQuery = document.getElementById('dash-order-search').value.toLowerCase();
+            const filterStatus = document.getElementById('dash-order-filter-status').value;
+
+            // Recalculate Seller Metrics
+            let pendingCount = 0;
+            let transitCount = 0;
+            let totalRevenue = 0;
+
+            orders.forEach(o => {
+                if (o.status === 'Pending') pendingCount++;
+                if (o.status === 'Processing' || o.status === 'Shipped') transitCount++;
+                if (o.status !== 'Cancelled') totalRevenue += o.totalPrice;
+            });
+
+            const totalEl = document.getElementById('metric-total-orders');
+            if (totalEl) totalEl.textContent = orders.length;
+            const pendingEl = document.getElementById('metric-pending-orders');
+            if (pendingEl) pendingEl.textContent = pendingCount;
+            const transitEl = document.getElementById('metric-transit-orders');
+            if (transitEl) transitEl.textContent = transitCount;
+            const revenueEl = document.getElementById('metric-total-revenue');
+            if (revenueEl) revenueEl.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+
+            const filtered = orders.filter(o => {
+                const matchesSearch = o.id.toLowerCase().includes(searchQuery) ||
+                                     o.customerName.toLowerCase().includes(searchQuery) ||
+                                     o.productName.toLowerCase().includes(searchQuery);
+                const matchesStatus = (filterStatus === 'ALL' || o.status === filterStatus);
+                return matchesSearch && matchesStatus;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(o => {
+                const tr = document.createElement('tr');
+
+                let badgeClass = 'badge-warning';
+                if (o.status === 'Processing') badgeClass = 'badge-info';
+                if (o.status === 'Shipped') badgeClass = 'badge-primary';
+                if (o.status === 'Delivered') badgeClass = 'badge-success';
+                if (o.status === 'Cancelled') badgeClass = 'badge-danger';
+
+                tr.innerHTML = `
+                    <td>
+                        <strong class="order-id-code">${o.id}</strong>
+                        <div class="text-xs text-muted">${o.orderDate}</div>
+                    </td>
+                    <td>
+                        <div class="font-weight-bold">${o.customerName}</div>
+                        <div class="text-xs text-muted">${o.location}</div>
+                    </td>
+                    <td>
+                        <div>${o.productName}</div>
+                        <div class="text-xs text-muted">Qty: <strong>${o.quantity}</strong></div>
+                    </td>
+                    <td class="font-weight-bold">₹${o.totalPrice.toLocaleString('en-IN')}</td>
+                    <td>
+                        <span class="status-pill ${badgeClass}">${o.status}</span>
+                    </td>
+                    <td>
+                        <select class="form-select text-sm" onchange="updateOrderStatus('${o.id}', this.value)">
+                            <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Set: Pending</option>
+                            <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Set: Processing</option>
+                            <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Set: Shipped</option>
+                            <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Set: Delivered</option>
+                            <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Set: Cancelled</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const o = orders.find(ord => ord.id === orderId);
+            if (!o) return;
+
+            const oldStatus = o.status;
+            o.status = newStatus;
+            saveOrders();
+
+            const dashOrdersView = document.getElementById('tab-dash-orders');
+            if (dashOrdersView && dashOrdersView.classList.contains('active')) {
+                renderDashOrders();
+            }
+            renderOrders();
+
+            showToast(`Order ${orderId} status changed: ${oldStatus} ➔ ${newStatus}`);
+        }
+
+        // Customer Store Orders — Read-only Order Status Tracker
         function renderOrders() {
             const grid = document.getElementById('orders-tracker-grid');
             const emptyState = document.getElementById('no-orders-empty');
