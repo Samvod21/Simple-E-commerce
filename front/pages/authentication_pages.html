@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlowStore - Authentication</title>
+    <link rel="stylesheet" href="../styles/auth_style.css">
+</head>
+<body>
+
+    <!-- Left side: Branding & Info -->
+    <div class="brand-panel">
+        <h1>Get all your buying problems solved today</h1>
+        <p>Join GlowStore and get connected to different suppliers across the globe</p>
+        <div class="brand-icon-wrap">
+            <svg class="brand-icon" viewBox="0 0 100 100" fill="currentColor">
+                <circle cx="50" cy="50" r="40" stroke="white" stroke-width="2" fill="none"/>
+                <path d="M50 10 v80 M10 50 h80" stroke="white" stroke-width="1"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Right side: Auth Form -->
+    <div class="auth-panel">
+        <div class="logo">
+            <div class="logo-main">GlowStore</div>
+            <div class="logo-sub">Authentication</div>
+        </div>
+
+        <div id="auth-container" class="auth-container">
+            <!-- Form content will be injected by JS -->
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('auth-container');
+        let isLogin = false;
+
+        function render() {
+            container.innerHTML = `
+                <h2 class="auth-title">${isLogin ? 'Login to your account' : 'Create new account'}</h2>
+                <form class="auth-form" onsubmit="handleAuthSubmit(event)">
+                    ${!isLogin ? `
+                        <div>
+                            <label class="field-label">Name</label>
+                            <input type="text" class="field-input" required>
+                        </div>` : ''}
+                    <div>
+                        <label class="field-label">Email Address</label>
+                        <input type="email" class="field-input" required>
+                    </div>
+                    <div>
+                        <label class="field-label">Password</label>
+                        <input type="password" class="field-input" required>
+                    </div>
+                    ${!isLogin ? `
+                        <div class="role-group">
+                            <label class="role-group-label">Signing As</label>
+                            <label class="role-option"><input type="radio" name="role" checked> Buyer</label>
+                            <label class="role-option"><input type="radio" name="role"> Supplier</label>
+                        </div>` : ''}
+                    
+                    <button type="submit" class="submit-btn">
+                        ${isLogin ? 'LOGIN' : 'SIGN UP'}
+                    </button>
+                </form>
+                
+                <p class="auth-footer">
+                    ${!isLogin ? 'By registering, you agree to the <a href="#" class="terms-link">Terms and Conditions</a><br><br>' : ''}
+                    ${isLogin ? 'Don\'t have an account?' : 'Already registered?'} 
+                    <button onclick="toggleAuth()" class="toggle-btn">${isLogin ? 'Sign up' : 'Login'}</button>
+                </p>
+            `;
+        }
+
+        function toggleAuth() {
+            isLogin = !isLogin;
+            render();
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            window.location.href = 'homepage.html';
+        }
+
+        render();
+    </script>
+</body>
+</html>

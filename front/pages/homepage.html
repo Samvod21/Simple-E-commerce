@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlowStore - Seller Dashboard</title>
+    <link rel="stylesheet" href="../styles/homepage-style.css">
+</head>
+
+<body>
+
+    <!-- Main Navigation Bar -->
+    <header class="navbar">
+        <div class="navbar-logo">
+            <span class="logo-main">GlowStore</span>
+            <span class="logo-sub">Seller Dashboard</span>
+        </div>
+
+        <ul class="navbar-links">
+            <li>
+                <a href="#home" id="main-nav-home" class="active" onclick="switchTab('home')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="#dashboard" id="main-nav-dashboard" onclick="switchTab('create')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                    </svg>
+                    Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="#cart" id="main-nav-cart" onclick="switchTab('cart')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    Cart
+                    <span class="cart-badge" id="cart-count-badge">0</span>
+                </a>
+            </li>
+            <li>
+                <a href="#orders" id="main-nav-orders" onclick="switchTab('orders')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1"/>
+                        <path d="M9 12h6M9 16h6"/>
+                    </svg>
+                    Store Orders
+                </a>
+            </li>
+        </ul>
+    </header>
+
+    <!-- Dashboard Hero Header -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 id="hero-title">GlowStore Marketplace</h1>
+            <p id="hero-subtitle">Browse uploaded products and purchase items directly.</p>
+        </div>
+    </section>
+
+    <!-- Main Dashboard Container -->
+    <main class="main-content">
+
+        <!-- Dashboard Secondary Navigation Bar (Tabs) -->
+        <nav class="dashboard-navbar hidden" id="sub-navbar" aria-label="Dashboard views">
+            <div class="dashboard-tabs">
+                <button class="dash-tab-btn active" id="tab-btn-create" onclick="switchTab('create')">
+                    <svg class="dash-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    <span>Create Product</span>
+                </button>
+                <button class="dash-tab-btn" id="tab-btn-manage" onclick="switchTab('manage')">
+                    <svg class="dash-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    <span>Manage Products</span>
+                    <span class="tab-count-badge" id="product-count-badge">0</span>
+                </button>
+                <button class="dash-tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
+                    <svg class="dash-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                    <span>Orders</span>
+                    <span class="tab-count-badge warning" id="orders-count-badge">0</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Toast Alert Notification -->
+        <div id="toast-notification" class="toast-notification hidden">
+            <span class="toast-icon">✓</span>
+            <span id="toast-message">Action completed successfully!</span>
+        </div>
+
+        <!-- TAB 0: HOME STOREFRONT -->
+        <section id="tab-home" class="dashboard-section tab-view active">
+            <div class="section-card">
+                <div class="card-header flex-header">
+                    <div>
+                        <h2>Storefront — Products for Sale</h2>
+                        <p class="section-subtitle">Browse uploaded products and purchase items directly.</p>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Toolbar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="home-search" class="search-input" placeholder="Search products by title, category, SKU..." oninput="renderHomeProducts()">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="home-filter-cat" class="sr-only">Filter by category</label>
+                        <select id="home-filter-cat" class="filter-select" onchange="renderHomeProducts()">
+                            <option value="ALL">All Categories</option>
+                            <option value="Handicrafts & Decor">Handicrafts & Decor</option>
+                            <option value="Textiles & Apparel">Textiles & Apparel</option>
+                            <option value="Electronics & Tech">Electronics & Tech</option>
+                            <option value="Agriculture & Spices">Agriculture & Spices</option>
+                            <option value="Industrial Goods">Industrial Goods</option>
+                            <option value="Beauty & Wellness">Beauty & Wellness</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Products Grid for Home View -->
+                <div id="home-products-grid" class="products-cards-grid">
+                    <!-- Dynamic Product Cards injected by JS -->
+                </div>
+
+                <div id="no-home-products-empty" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                    <h3>No products found</h3>
+                    <p>No uploaded products match your search or filter.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 1: CREATE PRODUCT -->
+        <section id="tab-create" class="dashboard-section tab-view">
+            <div class="section-card">
+                <div class="card-header">
+                    <div>
+                        <h2>Create New Product</h2>
+                        <p class="section-subtitle">Enter your product information to list it on GlowStore marketplace.</p>
+                    </div>
+                </div>
+
+                <form id="create-product-form" onsubmit="handleCreateProduct(event)">
+                    <div class="form-grid">
+                        <!-- Product Title -->
+                        <div class="form-group full-width">
+                            <label for="product-name" class="form-label">Product Title <span class="required">*</span></label>
+                            <input type="text" id="product-name" class="form-input" placeholder="e.g. Handcrafted Brass Peacock Diya Set" required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="form-group">
+                            <label for="product-category" class="form-label">Category <span class="required">*</span></label>
+                            <select id="product-category" class="form-select" required>
+                                <option value="" disabled selected>Select category</option>
+                                <option value="Handicrafts & Decor">Handicrafts & Decor</option>
+                                <option value="Textiles & Apparel">Textiles & Apparel</option>
+                                <option value="Electronics & Tech">Electronics & Tech</option>
+                                <option value="Agriculture & Spices">Agriculture & Spices</option>
+                                <option value="Industrial Goods">Industrial Goods</option>
+                                <option value="Beauty & Wellness">Beauty & Wellness</option>
+                            </select>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group">
+                            <label for="product-price" class="form-label">Price (₹) <span class="required">*</span></label>
+                            <input type="number" id="product-price" class="form-input" placeholder="e.g. 1499" min="1" step="0.01" required>
+                        </div>
+
+                        <!-- Stock Quantity -->
+                        <div class="form-group">
+                            <label for="product-stock" class="form-label">Stock Available <span class="required">*</span></label>
+                            <input type="number" id="product-stock" class="form-input" placeholder="e.g. 50" min="0" required>
+                        </div>
+
+                        <!-- Available Sizes (Optional) -->
+                        <div class="form-group full-width">
+                            <label for="product-sizes" class="form-label">Available Sizes <span class="text-muted">(Optional)</span></label>
+                            <input type="text" id="product-sizes" class="form-input" placeholder="e.g. S, M, L, XL or 500g, 1kg">
+                        </div>
+
+                        <!-- Image Upload from Local File -->
+                        <div class="form-group full-width">
+                            <label for="product-image-file" class="form-label">Product Image <span class="required">*</span></label>
+                            <div class="file-upload-wrapper">
+                                <label class="file-input-custom">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                        <polyline points="17 8 12 3 7 8"/>
+                                        <line x1="12" y1="3" x2="12" y2="15"/>
+                                    </svg>
+                                    <span class="file-upload-label">Select Local Image File</span>
+                                    <input type="file" id="product-image-file" accept="image/*" onchange="handleLocalImageUpload(this, 'product-image', 'preview-img', 'image-preview-box')" required>
+                                </label>
+                                <input type="hidden" id="product-image">
+                            </div>
+                            <div id="image-preview-box" class="image-preview-box hidden margin-top-xs">
+                                <img id="preview-img" src="" alt="Product Preview">
+                                <span>Uploaded Image Preview</span>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group full-width">
+                            <label for="product-description" class="form-label">Description <span class="required">*</span></label>
+                            <textarea id="product-description" class="form-textarea" rows="4" placeholder="Detailed product descriptions, dimensions, craftsmanship info..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-secondary" onclick="resetImagePreview()">Reset Form</button>
+                        <button type="submit" class="btn btn-primary">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            Publish Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 2: MANAGE PRODUCTS -->
+        <section id="tab-manage" class="dashboard-section tab-view">
+            <div class="section-card">
+                <div class="card-header flex-header">
+                    <div>
+                        <h2>Manage Products</h2>
+                        <p class="section-subtitle">View, edit details, or remove products in your store catalog.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="switchTab('create')">
+                        + Add New Product
+                    </button>
+                </div>
+
+                <!-- Filters & Search Toolbar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="manage-search" class="search-input" placeholder="Search by title, SKU, or ID..." oninput="renderProducts()">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="manage-filter-cat" class="sr-only">Filter by category</label>
+                        <select id="manage-filter-cat" class="filter-select" onchange="renderProducts()">
+                            <option value="ALL">All Categories</option>
+                            <option value="Handicrafts & Decor">Handicrafts & Decor</option>
+                            <option value="Textiles & Apparel">Textiles & Apparel</option>
+                            <option value="Electronics & Tech">Electronics & Tech</option>
+                            <option value="Agriculture & Spices">Agriculture & Spices</option>
+                            <option value="Industrial Goods">Industrial Goods</option>
+                            <option value="Beauty & Wellness">Beauty & Wellness</option>
+                        </select>
+
+                        <div class="view-toggle">
+                            <button id="view-btn-cards" class="view-btn active" onclick="setViewMode('cards')" title="Cards Grid View">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                                </svg>
+                                Cards View
+                            </button>
+                            <button id="view-btn-table" class="view-btn" onclick="setViewMode('table')" title="Table View">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <line x1="8" y1="6" x2="21" y2="6"/>
+                                    <line x1="8" y1="12" x2="21" y2="12"/>
+                                    <line x1="8" y1="18" x2="21" y2="18"/>
+                                    <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                    <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
+                                </svg>
+                                Table View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Cards Grid Container -->
+                <div id="products-cards-grid" class="products-cards-grid">
+                    <!-- Dynamic Product Cards injected by JS -->
+                </div>
+
+                <!-- Products Table container -->
+                <div id="products-table-container" class="table-responsive hidden">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock Status</th>
+                                <th>Date Added</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Injected by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="no-products-empty" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                    <h3>No products found</h3>
+                    <p>Get started by listing your first product in the Create section.</p>
+                    <button class="btn btn-primary" onclick="switchTab('create')">Create First Product</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB CART: SHOPPING CART -->
+        <section id="tab-cart" class="dashboard-section tab-view">
+            <div class="section-card">
+                <div class="card-header flex-header">
+                    <div>
+                        <h2>Shopping Cart</h2>
+                        <p class="section-subtitle">Review items in your cart and proceed to checkout.</p>
+                    </div>
+                </div>
+
+                <div id="cart-content-wrapper" class="cart-layout">
+                    <!-- Left side: Cart Items List -->
+                    <div id="cart-items-container" class="cart-items-list">
+                        <!-- Injected by JavaScript -->
+                    </div>
+
+                    <!-- Right side: Order Summary Card -->
+                    <div id="cart-summary-container" class="cart-summary-card">
+                        <h3 class="cart-summary-title">Order Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="cart-subtotal-val">₹0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping / Delivery</span>
+                            <span class="text-success font-weight-bold">FREE</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total</span>
+                            <span id="cart-grandtotal-val" class="summary-total-val">₹0</span>
+                        </div>
+                        <button type="button" id="btn-cart-checkout" class="btn-checkout" onclick="openCartCheckoutModal()">
+                            Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+
+                <div id="cart-empty-state" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    <h3>Your cart is empty</h3>
+                    <p>Add items from the Home Storefront to build your order.</p>
+                    <button class="btn btn-primary" onclick="switchTab('home')">Browse Products</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: STORE ORDERS (ORDER STATUS TRACKER) -->
+        <section id="tab-orders" class="dashboard-section tab-view">
+            <div class="section-card">
+                <div class="card-header flex-header">
+                    <div>
+                        <h2>Store Orders — Status Tracker</h2>
+                        <p class="section-subtitle">Track your placed orders and watch fulfillment status in real-time.</p>
+                    </div>
+                </div>
+
+                <!-- Toolbar Filter -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" id="order-search" class="search-input" placeholder="Search orders by Order ID, Customer, or Product..." oninput="renderOrders()">
+                    </div>
+
+                    <div class="filter-group">
+                        <select id="order-filter-status" class="filter-select" title="Filter by order status" aria-label="Filter by order status" onchange="renderOrders()">
+                            <option value="ALL">All Order Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Shipped">Shipped</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Orders Tracker Container -->
+                <div id="orders-tracker-grid" class="order-tracker-grid">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <div id="no-orders-empty" class="empty-state hidden">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1"/>
+                    </svg>
+                    <h3>No orders found</h3>
+                    <p>Add products to your cart and complete checkout to place an order.</p>
+                    <button class="btn btn-primary" onclick="switchTab('home')">Shop Products</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- EDIT PRODUCT MODAL -->
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Edit Product Listing</h3>
+                <button type="button" class="close-modal-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="edit-product-form" onsubmit="handleSaveEditProduct(event)">
+                <input type="hidden" id="edit-product-id">
+                
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="edit-product-name" class="form-label">Product Title</label>
+                        <input type="text" id="edit-product-name" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-category" class="form-label">Category</label>
+                        <select id="edit-product-category" class="form-select" required>
+                            <option value="Handicrafts & Decor">Handicrafts & Decor</option>
+                            <option value="Textiles & Apparel">Textiles & Apparel</option>
+                            <option value="Electronics & Tech">Electronics & Tech</option>
+                            <option value="Agriculture & Spices">Agriculture & Spices</option>
+                            <option value="Industrial Goods">Industrial Goods</option>
+                            <option value="Beauty & Wellness">Beauty & Wellness</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-price" class="form-label">Price (₹)</label>
+                        <input type="number" id="edit-product-price" class="form-input" min="1" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-stock" class="form-label">Stock Quantity</label>
+                        <input type="number" id="edit-product-stock" class="form-input" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-product-sizes" class="form-label">Available Sizes (Optional)</label>
+                        <input type="text" id="edit-product-sizes" class="form-input" placeholder="e.g. S, M, L, XL">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">Product Image</label>
+                        <div class="file-upload-wrapper">
+                            <label class="file-input-custom">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span class="file-upload-label">Upload New Local Image</span>
+                                <input type="file" id="edit-product-image-file" accept="image/*" onchange="handleLocalImageUpload(this, 'edit-product-image', 'edit-preview-img', 'edit-image-preview-box')">
+                            </label>
+                            <input type="hidden" id="edit-product-image">
+                        </div>
+                        <div id="edit-image-preview-box" class="image-preview-box hidden margin-top-xs">
+                            <img id="edit-preview-img" src="" alt="Edit Product Preview">
+                            <span>Image Preview</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="edit-product-description" class="form-label">Description</label>
+                        <textarea id="edit-product-description" class="form-textarea" rows="3" required></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Complete Your Order</h3>
+                <button type="button" class="close-modal-btn" onclick="closeCheckoutModal()">&times;</button>
+            </div>
+            <form id="checkout-form" onsubmit="handleConfirmCartPurchase(event)">
+                <div class="checkout-product-summary">
+                    <div id="checkout-cart-items-summary" class="checkout-items-mini-list"></div>
+                    <div class="checkout-total-price" id="checkout-grand-total-display">₹0</div>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Customer Name -->
+                    <div class="form-group full-width">
+                        <label for="checkout-customer-name" class="form-label">Full Name <span class="required">*</span></label>
+                        <input type="text" id="checkout-customer-name" class="form-input" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+
+                    <!-- Delivery Address -->
+                    <div class="form-group full-width">
+                        <label for="checkout-customer-location" class="form-label">Delivery Address / City <span class="required">*</span></label>
+                        <input type="text" id="checkout-customer-location" class="form-input" placeholder="e.g. Mumbai, MH" required>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCheckoutModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-confirm-order">Place Order & Pay</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Data Logic -->
+    <script>
+        // Store State Initialization with Storage Fallback & Initial Samples
+        const INITIAL_PRODUCTS = [
+            {
+                id: 'prod-101',
+                title: 'Handcrafted Brass Peacock Diya Set',
+                category: 'Handicrafts & Decor',
+                price: 1899,
+                stock: 24,
+                sizes: 'Medium, Large',
+                image: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=400&q=80',
+                description: 'Traditional solid brass oil lamps meticulously sculpted by artisans of Rajasthan.',
+                dateAdded: '2026-07-10'
+            },
+            {
+                id: 'prod-102',
+                title: 'Organic Malabar Black Pepper',
+                category: 'Agriculture & Spices',
+                price: 750,
+                stock: 8,
+                sizes: '250g, 500g, 1kg',
+                image: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=400&q=80',
+                description: 'Aromatic high-grade sun-dried Tellicherry black pepper straight from Kerala farms.',
+                dateAdded: '2026-07-12'
+            },
+            {
+                id: 'prod-103',
+                title: 'Handspun Chanderi Silk Saree with Zari Border',
+                category: 'Textiles & Apparel',
+                price: 4990,
+                stock: 5,
+                sizes: 'Free Size',
+                image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80',
+                description: 'Elegant lightweight silk weave crafted in Madhya Pradesh with intricate gold motifs.',
+                dateAdded: '2026-07-14'
+            }
+        ];
+
+        const INITIAL_ORDERS = [
+            {
+                id: 'ORD-9841',
+                customerName: 'Aarav Sharma',
+                location: 'Mumbai, MH',
+                productName: 'Handcrafted Brass Peacock Diya Set (Medium)',
+                quantity: 2,
+                totalPrice: 3798,
+                orderDate: '2026-07-15 14:30',
+                status: 'Pending'
+            },
+            {
+                id: 'ORD-9842',
+                customerName: 'Priya Venkatesh',
+                location: 'Bengaluru, KA',
+                productName: 'Organic Malabar Black Pepper (1kg)',
+                quantity: 3,
+                totalPrice: 2250,
+                orderDate: '2026-07-15 11:15',
+                status: 'Processing'
+            },
+            {
+                id: 'ORD-9840',
+                customerName: 'Vikram Mehta',
+                location: 'Delhi, DL',
+                productName: 'Handspun Chanderi Silk Saree with Zari Border',
+                quantity: 1,
+                totalPrice: 4990,
+                orderDate: '2026-07-14 09:45',
+                status: 'Shipped'
+            }
+        ];
+
+        // Global State Variables
+        let products = JSON.parse(localStorage.getItem('indiapages_seller_products')) || INITIAL_PRODUCTS;
+        let orders = JSON.parse(localStorage.getItem('indiapages_seller_orders')) || INITIAL_ORDERS;
+        let cart = JSON.parse(localStorage.getItem('indiapages_customer_cart')) || [];
+
+        function saveProducts() {
+            localStorage.setItem('indiapages_seller_products', JSON.stringify(products));
+            updateBadges();
+        }
+
+        function saveOrders() {
+            localStorage.setItem('indiapages_seller_orders', JSON.stringify(orders));
+            updateBadges();
+        }
+
+        function saveCart() {
+            localStorage.setItem('indiapages_customer_cart', JSON.stringify(cart));
+            updateBadges();
+        }
+
+        function updateBadges() {
+            const productBadge = document.getElementById('product-count-badge');
+            if (productBadge) productBadge.textContent = products.length;
+            
+            const pendingOrders = orders.filter(o => o.status === 'Pending').length;
+            const ordersBadge = document.getElementById('orders-count-badge');
+            if (ordersBadge) ordersBadge.textContent = pendingOrders;
+
+            const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+            const cartBadge = document.getElementById('cart-count-badge');
+            if (cartBadge) cartBadge.textContent = totalCartItems;
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            const tabs = ['home', 'cart', 'create', 'manage', 'orders'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const view = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    if (btn) btn.classList.add('active');
+                    if (view) view.classList.add('active');
+                } else {
+                    if (btn) btn.classList.remove('active');
+                    if (view) view.classList.remove('active');
+                }
+            });
+
+            const subNav = document.getElementById('sub-navbar');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+
+            // Sync main top navbar links active state
+            const mainHome = document.getElementById('main-nav-home');
+            const mainDash = document.getElementById('main-nav-dashboard');
+            const mainCart = document.getElementById('main-nav-cart');
+            const mainOrders = document.getElementById('main-nav-orders');
+
+            if (mainHome) mainHome.classList.remove('active');
+            if (mainDash) mainDash.classList.remove('active');
+            if (mainCart) mainCart.classList.remove('active');
+            if (mainOrders) mainOrders.classList.remove('active');
+
+            if (tabName === 'home') {
+                if (mainHome) mainHome.classList.add('active');
+                if (subNav) subNav.classList.add('hidden');
+                if (heroTitle) heroTitle.textContent = 'GlowStore Marketplace';
+                if (heroSubtitle) heroSubtitle.textContent = 'Browse uploaded products and add items to your cart.';
+                renderHomeProducts();
+            } else if (tabName === 'cart') {
+                if (mainCart) mainCart.classList.add('active');
+                if (subNav) subNav.classList.add('hidden');
+                if (heroTitle) heroTitle.textContent = 'Shopping Cart';
+                if (heroSubtitle) heroSubtitle.textContent = 'Review selected items in your cart and proceed to checkout.';
+                renderCart();
+            } else if (tabName === 'orders') {
+                if (mainOrders) mainOrders.classList.add('active');
+                if (subNav) subNav.classList.add('hidden');
+                if (heroTitle) heroTitle.textContent = 'Store Orders — Status Tracker';
+                if (heroSubtitle) heroSubtitle.textContent = 'Track your placed orders and watch fulfillment status in real-time.';
+                renderOrders();
+            } else {
+                if (mainDash) mainDash.classList.add('active');
+                if (subNav) subNav.classList.remove('hidden');
+                if (heroTitle) heroTitle.textContent = 'Seller Management Portal';
+                if (heroSubtitle) heroSubtitle.textContent = 'Easily create products, manage your inventory, and fulfill customer orders.';
+                if (tabName === 'manage') renderProducts();
+            }
+        }
+
+        // Local Image File Upload Handler
+        function handleLocalImageUpload(fileInput, targetUrlInputId, previewImgId, previewBoxId) {
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    document.getElementById(targetUrlInputId).value = dataUrl;
+                    if (previewImgId && previewBoxId) {
+                        document.getElementById(previewImgId).src = dataUrl;
+                        document.getElementById(previewBoxId).classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetImagePreview() {
+            document.getElementById('image-preview-box').classList.add('hidden');
+            const fileInput = document.getElementById('product-image-file');
+            if (fileInput) fileInput.value = '';
+            document.getElementById('product-image').value = '';
+        }
+
+        // Toast Notification System
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Tab 0: Render Storefront Home Division
+        function renderHomeProducts() {
+            const grid = document.getElementById('home-products-grid');
+            const emptyState = document.getElementById('no-home-products-empty');
+            const searchQuery = document.getElementById('home-search').value.toLowerCase();
+            const selectedCat = document.getElementById('home-filter-cat').value;
+
+            const filtered = products.filter(p => {
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery) ||
+                                      (p.category && p.category.toLowerCase().includes(searchQuery)) ||
+                                      (p.sizes && p.sizes.toLowerCase().includes(searchQuery));
+                const matchesCat = (selectedCat === 'ALL' || p.category === selectedCat);
+                return matchesSearch && matchesCat;
+            });
+
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+            }
+
+            filtered.forEach(p => {
+                let stockBadgeClass = 'badge-success';
+                let stockLabel = 'In Stock';
+                if (p.stock === 0) {
+                    stockBadgeClass = 'badge-danger';
+                    stockLabel = 'Out of Stock';
+                } else if (p.stock <= 10) {
+                    stockBadgeClass = 'badge-warning';
+                    stockLabel = `Low Stock (${p.stock})`;
+                }
+
+                // Size Selector / Badges
+                let sizeSelectorHtml = '';
+                if (p.sizes && p.sizes.trim()) {
+                    const sizeList = p.sizes.split(',').map(s => s.trim()).filter(Boolean);
+                    if (sizeList.length > 0) {
+                        sizeSelectorHtml = `
+                            <div class="margin-top-xs">
+                                <label for="size-select-${p.id}" class="card-meta-label">Select Size:</label>
+                                <select id="size-select-${p.id}" class="form-select text-sm margin-top-xs">
+                                    ${sizeList.map(s => `<option value="${s}">${s}</option>`).join('')}
+                                </select>
+                            </div>
+                        `;
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'home-product-card';
+                card.innerHTML = `
+                    <div class="card-img-wrapper">
+                        <img src="${p.image}" alt="${p.title}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80'">
+                        <span class="card-category-pill">${p.category}</span>
+                        <span class="status-pill ${stockBadgeClass} card-stock-badge">${stockLabel}</span>
+                    </div>
+
+                    <div class="card-content">
+                        <h3 class="card-title">${p.title}</h3>
+                        <p class="card-description">${p.description || 'No detailed description available.'}</p>
+                        
+                        ${sizeSelectorHtml}
+
+                        <div class="card-meta-box margin-top-sm">
+                            <div class="card-price-info">
+                                <span class="card-meta-label">Price</span>
+                                <span class="card-price-val">₹${p.price.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="card-stock-info">
+                                <span class="card-meta-label">Stock</span>
+                                <span class="card-stock-qty-val ${p.stock === 0 ? 'out-of-stock' : ''}">
+                                    ${p.stock} units
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="buy-card-actions">
+                        <button class="btn-buy" ${p.stock === 0 ? 'disabled' : ''} onclick="handleAddToCartClick('${p.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function handleAddToCartClick(productId) {
+            const p = products.find(prod => prod.id === productId);
+            if (!p || p.stock === 0) return;
+
+            const sizeSelect = document.getElementById(`size-select-${productId}`);
+            const selectedSize = sizeSelect ? sizeSelect.value : '';
+
+            // Check existing item in cart
+            const existingIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
+            if (existingIndex > -1) {
+                if (cart[existingIndex].quantity + 1 > p.stock) {
+                    alert(`Cannot add more than ${p.stock} available units in stock.`);
+                    return;
+                }
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({
+                    id: p.id,
+                    title: p.title,
+                    price: p.price,
+                    image: p.image,
+                    size: selectedSize,
+                    quantity: 1
+                });
+            }
+
+            saveCart();
+            showToast(`Added "${p.title}" ${selectedSize ? '(' + selectedSize + ')' : ''} to Cart!`);
+        }
+
+        // Render Cart View
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const contentWrapper = document.getElementById('cart-content-wrapper');
+            const emptyState = document.getElementById('cart-empty-state');
+            const subtotalVal = document.getElementById('cart-subtotal-val');
+            const grandTotalVal = document.getElementById('cart-grandtotal-val');
+
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                contentWrapper.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                contentWrapper.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+            }
+
+            let subtotal = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+
+                const card = document.createElement('div');
+                card.className = 'cart-item-card';
+                card.innerHTML = `
+                    <div class="cart-item-main">
+                        <img src="${item.image}" alt="${item.title}" class="cart-item-img" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80'">
+                        <div class="cart-item-info">
+                            <h4 class="cart-item-title">${item.title}</h4>
+                            ${item.size ? `<span class="size-pill">Size: ${item.size}</span>` : ''}
+                            <span class="cart-item-price">₹${item.price.toLocaleString('en-IN')} each</span>
+                        </div>
+                    </div>
+
+                    <div class="cart-controls">
+                        <div class="qty-control">
+                            <button type="button" class="btn-qty" onclick="updateCartQty(${index}, -1)">-</button>
+                            <span class="qty-val">${item.quantity}</span>
+                            <button type="button" class="btn-qty" onclick="updateCartQty(${index}, 1)">+</button>
+                        </div>
+                        <span class="font-weight-bold" style="min-width: 80px; text-align: right;">₹${itemTotal.toLocaleString('en-IN')}</span>
+                        <button type="button" class="btn-remove-item" onclick="removeFromCart(${index})" title="Remove item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            subtotalVal.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+            grandTotalVal.textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+        }
+
+        function updateCartQty(index, delta) {
+            if (index < 0 || index >= cart.length) return;
+            const p = products.find(prod => prod.id === cart[index].id);
+            
+            const newQty = cart[index].quantity + delta;
+            if (p && newQty > p.stock) {
+                alert(`Only ${p.stock} units available in stock!`);
+                return;
+            }
+
+            if (newQty <= 0) {
+                cart.splice(index, 1);
+            } else {
+                cart[index].quantity = newQty;
+            }
+
+            saveCart();
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            if (index >= 0 && index < cart.length) {
+                cart.splice(index, 1);
+                saveCart();
+                renderCart();
+                showToast('Item removed from cart.');
+            }
+        }
+
+        // Cart Checkout Modal Logic
+        function openCartCheckoutModal() {
+            if (cart.length === 0) return;
+
+            const summaryList = document.getElementById('checkout-cart-items-summary');
+            const totalDisplay = document.getElementById('checkout-grand-total-display');
+            summaryList.innerHTML = '';
+
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const row = document.createElement('div');
+                row.className = 'summary-row margin-top-xs';
+                row.innerHTML = `
+                    <span><strong>${item.quantity}x</strong> ${item.title} ${item.size ? '(' + item.size + ')' : ''}</span>
+                    <span>₹${itemTotal.toLocaleString('en-IN')}</span>
+                `;
+                summaryList.appendChild(row);
+            });
+
+            totalDisplay.textContent = `Grand Total: ₹${total.toLocaleString('en-IN')}`;
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function handleConfirmCartPurchase(e) {
+            e.preventDefault();
+            if (cart.length === 0) return;
+
+            const customerName = document.getElementById('checkout-customer-name').value.trim();
+            const customerLocation = document.getElementById('checkout-customer-location').value.trim();
+
+            // Deduct stock & create orders
+            cart.forEach(item => {
+                const p = products.find(prod => prod.id === item.id);
+                if (p) {
+                    p.stock = Math.max(0, p.stock - item.quantity);
+                }
+
+                const newOrder = {
+                    id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+                    customerName: customerName,
+                    location: customerLocation,
+                    productName: item.size ? `${item.title} (${item.size})` : item.title,
+                    quantity: item.quantity,
+                    totalPrice: item.price * item.quantity,
+                    orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
+                    status: 'Pending'
+                };
+
+                orders.unshift(newOrder);
+            });
+
+            saveProducts();
+            saveOrders();
+
+            // Clear Cart
+            cart = [];
+            saveCart();
+
+            closeCheckoutModal();
+            showToast('Order placed successfully! Redirecting to Store Orders...');
+
+            setTimeout(() => {
+                switchTab('orders');
+            }, 800);
+        }
+
+        // Tab 1: Create Product Handling
+        function handleCreateProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('product-name').value.trim();
+            const category = document.getElementById('product-category').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value, 10);
+            const sizes = document.getElementById('product-sizes').value.trim();
+            const image = document.getElementById('product-image').value.trim();
+
+            if (!image) {
+                alert('Please select and upload a local image file for the product.');
+                return;
+            }
+
+            const description = document.getElementById('product-description').value.trim();
+
+            const newId = `prod-${Date.now()}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            const newProd = {
+                id: newId,
+                title: name,
+                category,
+                price,
+                stock,
+                sizes,
+                image,
+                description,
+                dateAdded: today
+            };
+
+            products.unshift(newProd);
+            saveProducts();
+
+            // Reset form
+            document.getElementById('create-product-form').reset();
+            resetImagePreview();
+
+            showToast(`Product "${name}" created successfully!`);
+
+            setTimeout(() => {
+                switchTab('home');
+            }, 800);
+        }
+
+        // Global View Mode ('cards' or 'table')
+        let currentViewMode = 'cards';
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const btnCards = document.getElementById('view-btn-cards');
+            const btnTable = document.getElementById('view-btn-table');
+            const cardsGrid = document.getElementById('products-cards-grid');
+            const tableContainer = document.getElementById('products-table-container');
+
+            if (mode === 'cards') {
+                btnCards.classList.add('active');
+                btnTable.classList.remove('active');
+                cardsGrid.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            } else {
+                btnTable.classList.add('active');
+                btnCards.classList.remove('active');
+                tableContainer.classList.remove('hidden');
+                cardsGrid.classList.add('hidden');
+            }
+
+            renderProducts();
+        }
+
+        // Tab 2: Render & Manage Products
+        function renderProducts() {
+            const cardsGrid = document.getElementById('products-cards-grid');
+            const tableContainer = document.getElementById('products-table-container');
+            const tbody = document.getElementById('products-table-body');
+            const emptyState = document.getElementById('no-products-empty');
+            const searchQuery = document.getElementById('manage-search').value.toLowerCase();
+            const selectedCat = document.getElementById('manage-filter-cat').value;
+
+            const filtered = products.filter(p => {
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery) ||
+                                      (p.id && p.id.toLowerCase().includes(searchQuery));
+                const matchesCat = (selectedCat === 'ALL' || p.category === selectedCat);
+                return matchesSearch && matchesCat;
+            });
+
+            cardsGrid.innerHTML = '';
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                cardsGrid.classList.add('hidden');
+                tableContainer.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                if (currentViewMode === 'cards') {
+                    cardsGrid.classList.remove('hidden');
+                    tableContainer.classList.add('hidden');
+                } else {
+                    tableContainer.classList.remove('hidden');
+                    cardsGrid.classList.add('hidden');
+                }
+            }
+
+            filtered.forEach(p => {
+                let stockBadgeClass = 'badge-success';
+                let stockLabel = 'In Stock';
+                let stockText = `${p.stock} units`;
+
+                if (p.stock === 0) {
+                    stockBadgeClass = 'badge-danger';
+                    stockLabel = 'Out of Stock';
+                    stockText = 'Out of Stock';
+                } else if (p.stock <= 10) {
+                    stockBadgeClass = 'badge-warning';
+                    stockLabel = 'Low Stock';
+                    stockText = `Low Stock (${p.stock})`;
+                }
+
+                const sizesBadge = p.sizes ? `<span class="size-pill margin-top-xs">Size: ${p.sizes}</span>` : '';
+
+                // 1. Render Product Card for Grid View
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="card-img-wrapper">
+                        <img src="${p.image}" alt="${p.title}" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80'">
+                        <span class="card-category-pill">${p.category}</span>
+                        <span class="status-pill ${stockBadgeClass} card-stock-badge">${stockLabel}</span>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="card-db-id">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                            </svg>
+                            <span>Database ID: <code>${p.id}</code></span>
+                        </div>
+
+                        <h3 class="card-title">${p.title}</h3>
+                        <p class="card-description">${p.description || 'No detailed description available for this item.'}</p>
+                        ${sizesBadge}
+
+                        <div class="card-meta-box">
+                            <div class="card-price-info">
+                                <span class="card-meta-label">Price</span>
+                                <span class="card-price-val">₹${p.price.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="card-stock-info">
+                                <span class="card-meta-label">Quantity in Stock</span>
+                                <span class="card-stock-qty-val ${p.stock === 0 ? 'out-of-stock' : ''}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    </svg>
+                                    <strong>${p.stock}</strong> units
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer-info">
+                            <span>Added: <strong>${p.dateAdded || 'Recently'}</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn-action edit" title="Edit Product" onclick="openEditModal('${p.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit
+                        </button>
+                        <button class="btn-action delete" title="Delete Product" onclick="deleteProduct('${p.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            Delete
+                        </button>
+                    </div>
+                `;
+                cardsGrid.appendChild(card);
+
+                // 2. Render Table Row for Table View
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="product-cell">
+                            <img src="${p.image}" alt="${p.title}" class="table-img" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80'">
+                            <div>
+                                <strong class="product-title">${p.title}</strong>
+                                <span class="product-sku">ID: ${p.id} ${p.sizes ? '| Size: ' + p.sizes : ''}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="category-pill">${p.category}</span></td>
+                    <td class="font-weight-bold">₹${p.price.toLocaleString('en-IN')}</td>
+                    <td><span class="status-pill ${stockBadgeClass}">${stockText}</span></td>
+                    <td class="text-muted">${p.dateAdded || 'Recent'}</td>
+                    <td class="text-right">
+                        <div class="table-actions">
+                            <button class="btn-action edit" title="Edit Product" onclick="openEditModal('${p.id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                                Edit
+                            </button>
+                            <button class="btn-action delete" title="Delete Product" onclick="deleteProduct('${p.id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Product Delete
+        function deleteProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            if (confirm(`Are you sure you want to delete "${p.title}"? This action cannot be undone.`)) {
+                products = products.filter(prod => prod.id !== id);
+                saveProducts();
+                renderHomeProducts();
+                renderProducts();
+                showToast(`Product deleted.`);
+            }
+        }
+
+        // Product Edit Modal Logic
+        function openEditModal(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            document.getElementById('edit-product-id').value = p.id;
+            document.getElementById('edit-product-name').value = p.title;
+            document.getElementById('edit-product-category').value = p.category;
+            document.getElementById('edit-product-price').value = p.price;
+            document.getElementById('edit-product-stock').value = p.stock;
+            document.getElementById('edit-product-sizes').value = p.sizes || '';
+            document.getElementById('edit-product-image').value = p.image || '';
+            document.getElementById('edit-product-description').value = p.description || '';
+
+            const editFile = document.getElementById('edit-product-image-file');
+            if (editFile) editFile.value = '';
+
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function handleSaveEditProduct(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-product-id').value;
+            const pIndex = products.findIndex(prod => prod.id === id);
+            if (pIndex === -1) return;
+
+            products[pIndex].title = document.getElementById('edit-product-name').value.trim();
+            products[pIndex].category = document.getElementById('edit-product-category').value;
+            products[pIndex].price = parseFloat(document.getElementById('edit-product-price').value);
+            products[pIndex].stock = parseInt(document.getElementById('edit-product-stock').value, 10);
+            products[pIndex].sizes = document.getElementById('edit-product-sizes').value.trim();
+            products[pIndex].image = document.getElementById('edit-product-image').value.trim();
+            products[pIndex].description = document.getElementById('edit-product-description').value.trim();
+
+            saveProducts();
+            closeEditModal();
+            renderHomeProducts();
+            renderProducts();
+            showToast(`Updated "${products[pIndex].title}" details.`);
+        }
+
+        // Tab 3: Store Orders — Read-only Order Status Tracker
+        function renderOrders() {
+            const grid = document.getElementById('orders-tracker-grid');
+            const emptyState = document.getElementById('no-orders-empty');
+            const searchQuery = document.getElementById('order-search').value.toLowerCase();
+            const filterStatus = document.getElementById('order-filter-status').value;
+
+            const filtered = orders.filter(o => {
+                const matchesSearch = o.id.toLowerCase().includes(searchQuery) ||
+                                     o.customerName.toLowerCase().includes(searchQuery) ||
+                                     o.productName.toLowerCase().includes(searchQuery);
+                const matchesStatus = (filterStatus === 'ALL' || o.status === filterStatus);
+                return matchesSearch && matchesStatus;
+            });
+
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                grid.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                grid.classList.remove('hidden');
+            }
+
+            filtered.forEach(o => {
+                let badgeClass = 'badge-warning';
+                if (o.status === 'Processing') badgeClass = 'badge-info';
+                if (o.status === 'Shipped') badgeClass = 'badge-primary';
+                if (o.status === 'Delivered') badgeClass = 'badge-success';
+                if (o.status === 'Cancelled') badgeClass = 'badge-danger';
+
+                const card = document.createElement('div');
+                card.className = 'order-tracker-card';
+                card.innerHTML = `
+                    <div class="order-tracker-header">
+                        <div>
+                            <span class="order-tracker-id">${o.id}</span>
+                            <span class="order-tracker-date margin-left-xs">• Placed on ${o.orderDate}</span>
+                        </div>
+                        <span class="status-pill ${badgeClass} order-tracker-status">
+                            ${o.status}
+                        </span>
+                    </div>
+
+                    <div class="order-tracker-body">
+                        <div class="order-tracker-detail">
+                            <span class="order-tracker-label">Product Item</span>
+                            <span class="order-tracker-val">${o.productName} (Qty: ${o.quantity})</span>
+                        </div>
+                        <div class="order-tracker-detail">
+                            <span class="order-tracker-label">Customer</span>
+                            <span class="order-tracker-val">${o.customerName}</span>
+                        </div>
+                        <div class="order-tracker-detail">
+                            <span class="order-tracker-label">Delivery Address</span>
+                            <span class="order-tracker-val">${o.location}</span>
+                        </div>
+                        <div class="order-tracker-detail">
+                            <span class="order-tracker-label">Total Amount</span>
+                            <span class="order-tracker-val summary-total-val">₹${o.totalPrice.toLocaleString('en-IN')}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Initialize state on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBadges();
+            renderHomeProducts();
+            renderCart();
+            renderProducts();
+            renderOrders();
+        });
+    </script>
+</body>
+</html>
