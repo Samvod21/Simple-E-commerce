@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlowStore - Seller Dashboard</title>
+    <title>GlowStore</title>
     <link rel="stylesheet" href="../styles/homepage-style.css">
 </head>
 
@@ -13,7 +13,6 @@
     <header class="navbar">
         <div class="navbar-logo">
             <span class="logo-main">GlowStore</span>
-            <span class="logo-sub">Seller Dashboard</span>
         </div>
 
         <ul class="navbar-links">
@@ -258,24 +257,20 @@
                         <h2>Manage Products</h2>
                         <p class="section-subtitle">View, edit details, or remove products in your store catalog.</p>
                     </div>
-                    <button class="btn btn-primary btn-sm" onclick="switchTab('create')">
-                        + Add New Product
-                    </button>
                 </div>
 
                 <!-- Filters & Search Toolbar -->
                 <div class="toolbar">
-                    <div class="search-box">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                        </svg>
-                        <input type="text" id="manage-search" class="search-input" placeholder="Search by title, SKU, or ID..." oninput="renderProducts()">
-                    </div>
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"/>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" id="manage-search" class="search-input" placeholder="Search by title or ID..." oninput="renderProducts()">
+                        </div>
 
-                    <div class="filter-group">
-                        <label for="manage-filter-cat" class="sr-only">Filter by category</label>
-                        <select id="manage-filter-cat" class="filter-select" onchange="renderProducts()">
+                        <select id="manage-filter-cat" class="filter-select" aria-label="Filter by category" onchange="renderProducts()">
                             <option value="ALL">All Categories</option>
                             <option value="Handicrafts & Decor">Handicrafts & Decor</option>
                             <option value="Textiles & Apparel">Textiles & Apparel</option>
@@ -284,29 +279,29 @@
                             <option value="Industrial Goods">Industrial Goods</option>
                             <option value="Beauty & Wellness">Beauty & Wellness</option>
                         </select>
+                    </div>
 
-                        <div class="view-toggle">
-                            <button id="view-btn-cards" class="view-btn active" onclick="setViewMode('cards')" title="Cards Grid View">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <rect x="3" y="3" width="7" height="7" rx="1"/>
-                                    <rect x="14" y="3" width="7" height="7" rx="1"/>
-                                    <rect x="14" y="14" width="7" height="7" rx="1"/>
-                                    <rect x="3" y="14" width="7" height="7" rx="1"/>
-                                </svg>
-                                Cards View
-                            </button>
-                            <button id="view-btn-table" class="view-btn" onclick="setViewMode('table')" title="Table View">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                    <line x1="8" y1="6" x2="21" y2="6"/>
-                                    <line x1="8" y1="12" x2="21" y2="12"/>
-                                    <line x1="8" y1="18" x2="21" y2="18"/>
-                                    <line x1="3" y1="6" x2="3.01" y2="6"/>
-                                    <line x1="3" y1="12" x2="3.01" y2="12"/>
-                                    <line x1="3" y1="18" x2="3.01" y2="18"/>
-                                </svg>
-                                Table View
-                            </button>
-                        </div>
+                    <div class="view-toggle">
+                        <button id="view-btn-cards" class="view-btn active" onclick="setViewMode('cards')" title="Cards Grid View">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                                <rect x="14" y="14" width="7" height="7" rx="1"/>
+                                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            </svg>
+                            <span>Cards View</span>
+                        </button>
+                        <button id="view-btn-table" class="view-btn" onclick="setViewMode('table')" title="Table View">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <line x1="8" y1="6" x2="21" y2="6"/>
+                                <line x1="8" y1="12" x2="21" y2="12"/>
+                                <line x1="8" y1="18" x2="21" y2="18"/>
+                                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                                <line x1="3" y1="18" x2="3.01" y2="18"/>
+                            </svg>
+                            <span>Table View</span>
+                        </button>
                     </div>
                 </div>
 
@@ -881,11 +876,23 @@
                     const sizeList = p.sizes.split(',').map(s => s.trim()).filter(Boolean);
                     if (sizeList.length > 0) {
                         sizeSelectorHtml = `
-                            <div class="size-select-wrapper">
-                                <label for="size-select-${p.id}" class="card-meta-label">Select Size:</label>
-                                <select id="size-select-${p.id}" class="form-select text-sm">
-                                    ${sizeList.map(s => `<option value="${s}">${s}</option>`).join('')}
-                                </select>
+                            <div class="card-sizes-section">
+                                <div class="size-section-header">
+                                    <span class="size-section-label">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                        </svg>
+                                        Select Size:
+                                    </span>
+                                </div>
+                                <div class="size-chips-wrapper" id="size-chips-${p.id}">
+                                    ${sizeList.map((s, idx) => `
+                                        <button type="button" class="size-chip-btn ${idx === 0 ? 'selected' : ''}" 
+                                            onclick="selectSizeChip('${p.id}', '${s.replace(/'/g, "\\'")}', this)">
+                                            ${s}
+                                        </button>
+                                    `).join('')}
+                                </div>
                             </div>
                         `;
                     }
@@ -935,12 +942,27 @@
             });
         }
 
+        function selectSizeChip(productId, sizeValue, btnEl) {
+            const container = document.getElementById(`size-chips-${productId}`);
+            if (container) {
+                const btns = container.querySelectorAll('.size-chip-btn');
+                btns.forEach(b => b.classList.remove('selected'));
+            }
+            btnEl.classList.add('selected');
+        }
+
         function handleAddToCartClick(productId) {
             const p = products.find(prod => prod.id === productId);
             if (!p || p.stock === 0) return;
 
-            const sizeSelect = document.getElementById(`size-select-${productId}`);
-            const selectedSize = sizeSelect ? sizeSelect.value : '';
+            const container = document.getElementById(`size-chips-${productId}`);
+            let selectedSize = '';
+            if (container) {
+                const selectedBtn = container.querySelector('.size-chip-btn.selected');
+                if (selectedBtn) {
+                    selectedSize = selectedBtn.textContent.trim();
+                }
+            }
 
             // Check existing item in cart
             const existingIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
@@ -1247,7 +1269,20 @@
                     stockText = `Low Stock (${p.stock})`;
                 }
 
-                const sizesBadge = p.sizes ? `<span class="size-pill margin-top-xs">Size: ${p.sizes}</span>` : '';
+                let sizesBadge = '';
+                if (p.sizes && p.sizes.trim()) {
+                    const sizeList = p.sizes.split(',').map(s => s.trim()).filter(Boolean);
+                    if (sizeList.length > 0) {
+                        sizesBadge = `
+                            <div class="card-sizes-section">
+                                <span class="size-section-label">Available Sizes:</span>
+                                <div class="size-chips-wrapper">
+                                    ${sizeList.map(s => `<span class="seller-size-tag">${s}</span>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
 
                 // 1. Render Product Card for Grid View
                 const card = document.createElement('div');
