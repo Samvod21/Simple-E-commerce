@@ -1,6 +1,49 @@
 const mongoose = require('mongoose');
 
+// A single line item inside an order (one product, from the order's seller)
+const orderItemSchema = new mongoose.Schema({
+    product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    productName: {
+        type: String,
+        required: [true, 'Product name is required'],
+        trim: true
+    },
+    quantity: {
+        type: Number,
+        required: [true, 'Order quantity is required'],
+        min: [1, 'Quantity must be at least 1'],
+        default: 1
+    },
+    price: {
+        type: Number,
+        required: [true, 'Unit price is required'],
+        min: [0, 'Price cannot be negative']
+    },
+    subtotal: {
+        type: Number,
+        required: [true, 'Subtotal is required'],
+        min: [0, 'Subtotal cannot be negative']
+    }
+}, { _id: false });
+
+// One Order document = one seller's share of a buyer's checkout.
+// If a buyer checks out with products from 2 different sellers, 2 Order
+// documents are created (one per seller), each containing that seller's items.
 const orderSchema = new mongoose.Schema({
+    buyer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'Buyer reference is required']
+    },
+    seller: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'Seller reference is required']
+    },
     customerName: {
         type: String,
         required: [true, 'Customer name is required'],
@@ -11,20 +54,13 @@ const orderSchema = new mongoose.Schema({
         required: [true, 'Delivery address/location is required'],
         trim: true
     },
-    productName: {
-        type: String,
-        required: [true, 'Product name is required'],
-        trim: true
-    },
-    productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product'
-    },
-    quantity: {
-        type: Number,
-        required: [true, 'Order quantity is required'],
-        min: [1, 'Quantity must be at least 1'],
-        default: 1
+    items: {
+        type: [orderItemSchema],
+        required: true,
+        validate: {
+            validator: (items) => Array.isArray(items) && items.length > 0,
+            message: 'An order must contain at least one item'
+        }
     },
     totalPrice: {
         type: Number,
