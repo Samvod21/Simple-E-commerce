@@ -25,7 +25,7 @@
                     Home
                 </a>
             </li>
-            <li>
+            <li id="nav-item-dashboard">
                 <a href="#dashboard" id="main-nav-dashboard" onclick="switchTab('create')">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="7" height="9" rx="1"/>
@@ -58,6 +58,14 @@
                 </a>
             </li>
         </ul>
+
+        <div class="user-profile-bar">
+            <div id="user-badge">
+                <span id="user-name-display">Loading...</span>
+                <span id="user-role-badge">Role</span>
+            </div>
+            <button class="user-logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
     </header>
 
     <!-- Dashboard Hero Header -->
@@ -635,91 +643,216 @@
         </div>
     </div>
 
+    <!-- PRODUCT DETAIL MODAL -->
+    <div id="product-detail-modal" class="modal-overlay hidden">
+        <div class="modal-card modal-card-lg">
+            <div class="modal-header">
+                <h3 id="detail-product-title">Product Details</h3>
+                <button type="button" class="close-modal-btn" onclick="closeProductDetailModal()">&times;</button>
+            </div>
+            <div class="product-detail-modal-body">
+                <div class="detail-media-col">
+                    <img id="detail-product-image" src="" alt="Product" class="detail-modal-img">
+                    <div class="detail-badge-group margin-top-sm">
+                        <span id="detail-product-category" class="category-pill">Category</span>
+                        <span id="detail-product-stock-badge" class="status-pill badge-success">In Stock</span>
+                    </div>
+                </div>
+                <div class="detail-info-col">
+                    <h2 id="detail-product-heading" class="detail-heading">Title</h2>
+                    <div class="detail-price-tag" id="detail-product-price">₹0</div>
+                    
+                    <div class="detail-section">
+                        <h4>Product Description</h4>
+                        <p id="detail-product-description" class="detail-description-text"></p>
+                    </div>
+
+                    <div id="detail-sizes-container" class="detail-section hidden">
+                        <h4>Available Sizes / Options</h4>
+                        <div id="detail-size-chips" class="size-chips-wrapper"></div>
+                    </div>
+
+                    <div class="detail-meta-list">
+                        <div class="detail-meta-item">
+                            <span class="meta-label">Stock Units Available:</span>
+                            <span id="detail-product-stock-count" class="meta-val">0</span>
+                        </div>
+                        <div class="detail-meta-item" id="detail-seller-box">
+                            <span class="meta-label">Seller:</span>
+                            <span id="detail-product-seller" class="meta-val">GlowStore Seller</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-modal-actions margin-top-lg">
+                        <button type="button" id="detail-btn-add-cart" class="btn btn-primary btn-lg full-width-btn" onclick="handleDetailAddToCart()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            <span>Add to Cart</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Data Logic -->
     <script>
-        // Store State Initialization with Storage Fallback & Initial Samples
-        const INITIAL_PRODUCTS = [
-            {
-                id: 'prod-101',
-                title: 'Handcrafted Brass Peacock Diya Set',
-                category: 'Handicrafts & Decor',
-                price: 1899,
-                stock: 24,
-                sizes: 'Medium, Large',
-                image: 'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=400&q=80',
-                description: 'Traditional solid brass oil lamps meticulously sculpted by artisans of Rajasthan.',
-                dateAdded: '2026-07-10'
-            },
-            {
-                id: 'prod-102',
-                title: 'Organic Malabar Black Pepper',
-                category: 'Agriculture & Spices',
-                price: 750,
-                stock: 8,
-                sizes: '250g, 500g, 1kg',
-                image: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=400&q=80',
-                description: 'Aromatic high-grade sun-dried Tellicherry black pepper straight from Kerala farms.',
-                dateAdded: '2026-07-12'
-            },
-            {
-                id: 'prod-103',
-                title: 'Handspun Chanderi Silk Saree with Zari Border',
-                category: 'Textiles & Apparel',
-                price: 4990,
-                stock: 5,
-                sizes: 'Free Size',
-                image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80',
-                description: 'Elegant lightweight silk weave crafted in Madhya Pradesh with intricate gold motifs.',
-                dateAdded: '2026-07-14'
-            }
-        ];
+        // API Base URL & Authentication Guard
+        const API_BASE = 'http://localhost:5000/api';
+        const token = localStorage.getItem('glowstore_token');
+        const currentUser = JSON.parse(localStorage.getItem('glowstore_user') || 'null');
 
-        const INITIAL_ORDERS = [
-            {
-                id: 'ORD-9841',
-                customerName: 'Aarav Sharma',
-                location: 'Mumbai, MH',
-                productName: 'Handcrafted Brass Peacock Diya Set (Medium)',
-                quantity: 2,
-                totalPrice: 3798,
-                orderDate: '2026-07-15 14:30',
-                status: 'Pending'
-            },
-            {
-                id: 'ORD-9842',
-                customerName: 'Priya Venkatesh',
-                location: 'Bengaluru, KA',
-                productName: 'Organic Malabar Black Pepper (1kg)',
-                quantity: 3,
-                totalPrice: 2250,
-                orderDate: '2026-07-15 11:15',
-                status: 'Processing'
-            },
-            {
-                id: 'ORD-9840',
-                customerName: 'Vikram Mehta',
-                location: 'Delhi, DL',
-                productName: 'Handspun Chanderi Silk Saree with Zari Border',
-                quantity: 1,
-                totalPrice: 4990,
-                orderDate: '2026-07-14 09:45',
-                status: 'Shipped'
-            }
-        ];
-
-        // Global State Variables
-        let products = JSON.parse(localStorage.getItem('indiapages_seller_products')) || INITIAL_PRODUCTS;
-        let orders = JSON.parse(localStorage.getItem('indiapages_seller_orders')) || INITIAL_ORDERS;
-        let cart = JSON.parse(localStorage.getItem('indiapages_customer_cart')) || [];
-
-        function saveProducts() {
-            localStorage.setItem('indiapages_seller_products', JSON.stringify(products));
-            updateBadges();
+        if (!token || !currentUser) {
+            window.location.href = 'authentication_pages.html';
         }
 
-        function saveOrders() {
-            localStorage.setItem('indiapages_seller_orders', JSON.stringify(orders));
-            updateBadges();
+        // Global State Variables (Data loaded dynamically from REST API)
+        let products = [];
+        let myProducts = [];
+        let myBuyerOrders = [];
+        let sellerOrders = [];
+        let cart = JSON.parse(localStorage.getItem('indiapages_customer_cart')) || [];
+        let selectedDetailProductId = null;
+        let selectedDetailSize = '';
+
+        function handleLogout() {
+            localStorage.removeItem('glowstore_token');
+            localStorage.removeItem('glowstore_user');
+            window.location.href = 'authentication_pages.html';
+        }
+
+        // Central API fetch helper attached with Bearer Token
+        async function apiFetch(endpoint, options = {}) {
+            options.headers = options.headers || {};
+            if (token) {
+                options.headers['Authorization'] = `Bearer ${token}`;
+            }
+            if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(options.body);
+            }
+
+            const res = await fetch(`${API_BASE}${endpoint}`, options);
+            const contentType = res.headers.get('content-type') || '';
+            let data;
+            if (contentType.includes('application/json')) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(`Server status ${res.status}: ${text.substring(0, 100)}`);
+            }
+
+            if (!res.ok) {
+                throw new Error(data.message || 'API request failed');
+            }
+            return data;
+        }
+
+        // Setup user header profile & role permissions
+        function setupUserProfile() {
+            if (currentUser) {
+                const nameEl = document.getElementById('user-name-display');
+                const roleEl = document.getElementById('user-role-badge');
+                if (nameEl) nameEl.textContent = currentUser.name || currentUser.email;
+                if (roleEl) roleEl.textContent = currentUser.role || 'Buyer';
+
+                const isBuyer = (currentUser.role || 'Buyer').toLowerCase() === 'buyer';
+                const dashNavItem = document.getElementById('nav-item-dashboard');
+                const subNav = document.getElementById('sub-navbar');
+
+                // Role-based visibility: completely hide dashboard for Buyer role
+                if (isBuyer) {
+                    if (dashNavItem) dashNavItem.style.display = 'none';
+                    if (subNav) subNav.style.display = 'none';
+                } else {
+                    if (dashNavItem) dashNavItem.style.display = 'flex';
+                }
+            }
+        }
+
+        // API Fetchers
+        async function fetchProducts() {
+            try {
+                const data = await apiFetch('/products');
+                products = (data.products || []).map(p => ({
+                    ...p,
+                    id: p._id,
+                    dateAdded: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : 'Recent'
+                }));
+                renderHomeProducts();
+                renderProducts();
+                updateBadges();
+            } catch (err) {
+                console.error('Error fetching products:', err);
+                showToast(`Failed to load products: ${err.message}`);
+            }
+        }
+
+        async function fetchMyProducts() {
+            const isSupplier = (currentUser?.role || '').toLowerCase() === 'supplier';
+            if (currentUser && isSupplier) {
+                try {
+                    const data = await apiFetch('/products/mine');
+                    myProducts = (data.products || []).map(p => ({
+                        ...p,
+                        id: p._id,
+                        dateAdded: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : 'Recent'
+                    }));
+                    renderProducts();
+                    updateBadges();
+                } catch (err) {
+                    console.error('Error fetching seller products:', err);
+                }
+            }
+        }
+
+        // Fetch orders placed by the current user when buying products (Customer Purchase History)
+        async function fetchMyBuyerOrders() {
+            try {
+                const data = await apiFetch('/orders/mine');
+                myBuyerOrders = (data.orders || []).map(o => {
+                    const productNameSummary = o.items ? o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ') : 'Product';
+                    const totalQty = o.items ? o.items.reduce((sum, i) => sum + i.quantity, 0) : 1;
+                    return {
+                        ...o,
+                        id: o._id,
+                        orderDate: o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN') : 'Recent',
+                        productName: productNameSummary,
+                        quantity: totalQty
+                    };
+                });
+                renderOrders();
+                updateBadges();
+            } catch (err) {
+                console.error('Error fetching buyer orders:', err);
+            }
+        }
+
+        // Fetch incoming orders placed for products sold by the seller (Seller Dashboard Orders)
+        async function fetchSellerOrders() {
+            const isSupplier = (currentUser?.role || '').toLowerCase() === 'supplier';
+            if (!isSupplier) return;
+            try {
+                const data = await apiFetch('/orders/seller');
+                sellerOrders = (data.orders || []).map(o => {
+                    const productNameSummary = o.items ? o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ') : 'Product';
+                    const totalQty = o.items ? o.items.reduce((sum, i) => sum + i.quantity, 0) : 1;
+                    return {
+                        ...o,
+                        id: o._id,
+                        orderDate: o.createdAt ? new Date(o.createdAt).toLocaleString('en-IN') : 'Recent',
+                        productName: productNameSummary,
+                        quantity: totalQty
+                    };
+                });
+                renderDashOrders();
+                updateBadges();
+            } catch (err) {
+                console.error('Error fetching seller orders:', err);
+            }
         }
 
         function saveCart() {
@@ -728,10 +861,11 @@
         }
 
         function updateBadges() {
+            const isSupplier = (currentUser?.role || '').toLowerCase() === 'supplier';
             const productBadge = document.getElementById('product-count-badge');
-            if (productBadge) productBadge.textContent = products.length;
+            if (productBadge) productBadge.textContent = (isSupplier ? myProducts : products).length;
             
-            const pendingOrders = orders.filter(o => o.status === 'Pending').length;
+            const pendingOrders = sellerOrders.filter(o => o.status === 'Pending').length;
             const ordersBadge = document.getElementById('orders-count-badge');
             if (ordersBadge) ordersBadge.textContent = pendingOrders;
 
@@ -742,6 +876,13 @@
 
         // Tab Switching Logic
         function switchTab(tabName) {
+            const isBuyer = (currentUser?.role || 'Buyer').toLowerCase() === 'buyer';
+
+            // Guard: Buyers cannot switch to seller dashboard views
+            if (isBuyer && ['create', 'manage', 'dash-orders'].includes(tabName)) {
+                tabName = 'home';
+            }
+
             const tabs = ['home', 'cart', 'create', 'manage', 'dash-orders', 'orders'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
@@ -787,14 +928,14 @@
                 if (subNav) subNav.classList.add('hidden');
                 if (heroTitle) heroTitle.textContent = 'Store Orders — Status Tracker';
                 if (heroSubtitle) heroSubtitle.textContent = 'Track your placed orders and watch fulfillment status in real-time.';
-                renderOrders();
+                fetchMyBuyerOrders();
             } else {
                 if (mainDash) mainDash.classList.add('active');
-                if (subNav) subNav.classList.remove('hidden');
+                if (subNav && !isBuyer) subNav.classList.remove('hidden');
                 if (heroTitle) heroTitle.textContent = 'Seller Management Portal';
                 if (heroSubtitle) heroSubtitle.textContent = 'Easily create products, manage your inventory, and fulfill customer orders.';
                 if (tabName === 'manage') renderProducts();
-                if (tabName === 'dash-orders') renderDashOrders();
+                if (tabName === 'dash-orders') fetchSellerOrders();
             }
         }
 
@@ -865,7 +1006,7 @@
                 if (p.stock === 0) {
                     stockBadgeClass = 'badge-danger';
                     stockLabel = 'Out of Stock';
-                } else if (p.stock <= 10) {
+                } else if (p.stock <= 5) {
                     stockBadgeClass = 'badge-warning';
                     stockLabel = `Low Stock (${p.stock})`;
                 }
@@ -928,6 +1069,13 @@
                     </div>
 
                     <div class="buy-card-actions">
+                        <button type="button" class="btn-details" onclick="openProductDetailModal('${p.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Details
+                        </button>
                         <button class="btn-buy" ${p.stock === 0 ? 'disabled' : ''} onclick="handleAddToCartClick('${p.id}')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <circle cx="9" cy="21" r="1"/>
@@ -942,6 +1090,93 @@
             });
         }
 
+        // Product Detail Modal Logic
+        function openProductDetailModal(productId) {
+            const p = products.find(prod => prod.id === productId) || myProducts.find(prod => prod.id === productId);
+            if (!p) return;
+
+            selectedDetailProductId = p.id;
+            selectedDetailSize = '';
+
+            document.getElementById('detail-product-title').textContent = 'Product Details';
+            document.getElementById('detail-product-heading').textContent = p.title;
+            document.getElementById('detail-product-image').src = p.image || 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80';
+            document.getElementById('detail-product-category').textContent = p.category || 'General';
+            document.getElementById('detail-product-price').textContent = `₹${p.price.toLocaleString('en-IN')}`;
+            document.getElementById('detail-product-description').textContent = p.description || 'No detailed description available for this item.';
+            document.getElementById('detail-product-stock-count').textContent = `${p.stock} units`;
+
+            const stockBadge = document.getElementById('detail-product-stock-badge');
+            if (p.stock === 0) {
+                stockBadge.className = 'status-pill badge-danger';
+                stockBadge.textContent = 'Out of Stock';
+            } else if (p.stock <= 5) {
+                stockBadge.className = 'status-pill badge-warning';
+                stockBadge.textContent = `Low Stock (${p.stock})`;
+            } else {
+                stockBadge.className = 'status-pill badge-success';
+                stockBadge.textContent = 'In Stock';
+            }
+
+            const sellerEl = document.getElementById('detail-product-seller');
+            if (sellerEl) {
+                sellerEl.textContent = p.seller ? (p.seller.name || p.seller.email || 'GlowStore Supplier') : 'GlowStore Supplier';
+            }
+
+            // Available Sizes Chips inside Modal
+            const sizesContainer = document.getElementById('detail-sizes-container');
+            const sizeChipsBox = document.getElementById('detail-size-chips');
+            if (p.sizes && p.sizes.trim()) {
+                const sizeList = p.sizes.split(',').map(s => s.trim()).filter(Boolean);
+                if (sizeList.length > 0) {
+                    selectedDetailSize = sizeList[0];
+                    sizesContainer.classList.remove('hidden');
+                    sizeChipsBox.innerHTML = sizeList.map((s, idx) => `
+                        <button type="button" class="size-chip-btn ${idx === 0 ? 'selected' : ''}"
+                            onclick="selectDetailSizeChip('${s.replace(/'/g, "\\'")}', this)">
+                            ${s}
+                        </button>
+                    `).join('');
+                } else {
+                    sizesContainer.classList.add('hidden');
+                }
+            } else {
+                sizesContainer.classList.add('hidden');
+            }
+
+            const addCartBtn = document.getElementById('detail-btn-add-cart');
+            if (addCartBtn) {
+                if (p.stock === 0) {
+                    addCartBtn.disabled = true;
+                    addCartBtn.querySelector('span').textContent = 'Out of Stock';
+                } else {
+                    addCartBtn.disabled = false;
+                    addCartBtn.querySelector('span').textContent = 'Add to Cart';
+                }
+            }
+
+            document.getElementById('product-detail-modal').classList.remove('hidden');
+        }
+
+        function selectDetailSizeChip(sizeVal, btnEl) {
+            selectedDetailSize = sizeVal;
+            const box = document.getElementById('detail-size-chips');
+            if (box) {
+                box.querySelectorAll('.size-chip-btn').forEach(b => b.classList.remove('selected'));
+            }
+            btnEl.classList.add('selected');
+        }
+
+        function closeProductDetailModal() {
+            document.getElementById('product-detail-modal').classList.add('hidden');
+        }
+
+        function handleDetailAddToCart() {
+            if (!selectedDetailProductId) return;
+            handleAddToCartClick(selectedDetailProductId, selectedDetailSize);
+            closeProductDetailModal();
+        }
+
         function selectSizeChip(productId, sizeValue, btnEl) {
             const container = document.getElementById(`size-chips-${productId}`);
             if (container) {
@@ -951,16 +1186,18 @@
             btnEl.classList.add('selected');
         }
 
-        function handleAddToCartClick(productId) {
-            const p = products.find(prod => prod.id === productId);
+        function handleAddToCartClick(productId, overrideSize) {
+            const p = products.find(prod => prod.id === productId) || myProducts.find(prod => prod.id === productId);
             if (!p || p.stock === 0) return;
 
-            const container = document.getElementById(`size-chips-${productId}`);
-            let selectedSize = '';
-            if (container) {
-                const selectedBtn = container.querySelector('.size-chip-btn.selected');
-                if (selectedBtn) {
-                    selectedSize = selectedBtn.textContent.trim();
+            let selectedSize = overrideSize !== undefined ? overrideSize : '';
+            if (!selectedSize) {
+                const container = document.getElementById(`size-chips-${productId}`);
+                if (container) {
+                    const selectedBtn = container.querySelector('.size-chip-btn.selected');
+                    if (selectedBtn) {
+                        selectedSize = selectedBtn.textContent.trim();
+                    }
                 }
             }
 
@@ -1030,7 +1267,7 @@
                             <span class="qty-val">${item.quantity}</span>
                             <button type="button" class="btn-qty" onclick="updateCartQty(${index}, 1)">+</button>
                         </div>
-                        <span class="font-weight-bold" style="min-width: 80px; text-align: right;">₹${itemTotal.toLocaleString('en-IN')}</span>
+                        <span class="font-weight-bold cart-item-total">₹${itemTotal.toLocaleString('en-IN')}</span>
                         <button type="button" class="btn-remove-item" onclick="removeFromCart(${index})" title="Remove item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <polyline points="3 6 5 6 21 6"/>
@@ -1098,6 +1335,13 @@
             });
 
             totalDisplay.textContent = `Grand Total: ₹${total.toLocaleString('en-IN')}`;
+
+            // Auto-fill customer name if present in session
+            const nameInput = document.getElementById('checkout-customer-name');
+            if (nameInput && currentUser && currentUser.name) {
+                nameInput.value = currentUser.name;
+            }
+
             document.getElementById('checkout-modal').classList.remove('hidden');
         }
 
@@ -1105,51 +1349,47 @@
             document.getElementById('checkout-modal').classList.add('hidden');
         }
 
-        function handleConfirmCartPurchase(e) {
+        async function handleConfirmCartPurchase(e) {
             e.preventDefault();
             if (cart.length === 0) return;
 
             const customerName = document.getElementById('checkout-customer-name').value.trim();
             const customerLocation = document.getElementById('checkout-customer-location').value.trim();
 
-            // Deduct stock & create orders
-            cart.forEach(item => {
-                const p = products.find(prod => prod.id === item.id);
-                if (p) {
-                    p.stock = Math.max(0, p.stock - item.quantity);
-                }
+            const orderItems = cart.map(item => ({
+                productId: item.id,
+                quantity: item.quantity
+            }));
 
-                const newOrder = {
-                    id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-                    customerName: customerName,
-                    location: customerLocation,
-                    productName: item.size ? `${item.title} (${item.size})` : item.title,
-                    quantity: item.quantity,
-                    totalPrice: item.price * item.quantity,
-                    orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
-                    status: 'Pending'
-                };
+            try {
+                await apiFetch('/orders', {
+                    method: 'POST',
+                    body: {
+                        customerName,
+                        location: customerLocation,
+                        items: orderItems
+                    }
+                });
 
-                orders.unshift(newOrder);
-            });
+                cart = [];
+                saveCart();
+                closeCheckoutModal();
+                showToast('Order placed successfully! Redirecting to Store Orders...');
 
-            saveProducts();
-            saveOrders();
+                await fetchProducts();
+                await fetchMyBuyerOrders();
+                if (currentUser && currentUser.role === 'Supplier') await fetchSellerOrders();
 
-            // Clear Cart
-            cart = [];
-            saveCart();
-
-            closeCheckoutModal();
-            showToast('Order placed successfully! Redirecting to Store Orders...');
-
-            setTimeout(() => {
-                switchTab('orders');
-            }, 800);
+                setTimeout(() => {
+                    switchTab('orders');
+                }, 800);
+            } catch (err) {
+                alert(`Checkout failed: ${err.message}`);
+            }
         }
 
         // Tab 1: Create Product Handling
-        function handleCreateProduct(e) {
+        async function handleCreateProduct(e) {
             e.preventDefault();
             const name = document.getElementById('product-name').value.trim();
             const category = document.getElementById('product-category').value;
@@ -1165,33 +1405,33 @@
 
             const description = document.getElementById('product-description').value.trim();
 
-            const newId = `prod-${Date.now()}`;
-            const today = new Date().toISOString().split('T')[0];
+            try {
+                await apiFetch('/products', {
+                    method: 'POST',
+                    body: {
+                        title: name,
+                        category,
+                        price,
+                        stock,
+                        sizes,
+                        image,
+                        description
+                    }
+                });
 
-            const newProd = {
-                id: newId,
-                title: name,
-                category,
-                price,
-                stock,
-                sizes,
-                image,
-                description,
-                dateAdded: today
-            };
+                document.getElementById('create-product-form').reset();
+                resetImagePreview();
+                showToast(`Product "${name}" created successfully!`);
 
-            products.unshift(newProd);
-            saveProducts();
+                await fetchProducts();
+                if (currentUser.role === 'Supplier') await fetchMyProducts();
 
-            // Reset form
-            document.getElementById('create-product-form').reset();
-            resetImagePreview();
-
-            showToast(`Product "${name}" created successfully!`);
-
-            setTimeout(() => {
-                switchTab('home');
-            }, 800);
+                setTimeout(() => {
+                    switchTab('home');
+                }, 800);
+            } catch (err) {
+                alert(`Failed to create product: ${err.message}`);
+            }
         }
 
         // Global View Mode ('cards' or 'table')
@@ -1228,7 +1468,9 @@
             const searchQuery = document.getElementById('manage-search').value.toLowerCase();
             const selectedCat = document.getElementById('manage-filter-cat').value;
 
-            const filtered = products.filter(p => {
+            const listToRender = currentUser.role === 'Supplier' ? myProducts : products;
+
+            const filtered = listToRender.filter(p => {
                 const matchesSearch = p.title.toLowerCase().includes(searchQuery) ||
                                       (p.id && p.id.toLowerCase().includes(searchQuery));
                 const matchesCat = (selectedCat === 'ALL' || p.category === selectedCat);
@@ -1263,7 +1505,7 @@
                     stockBadgeClass = 'badge-danger';
                     stockLabel = 'Out of Stock';
                     stockText = 'Out of Stock';
-                } else if (p.stock <= 10) {
+                } else if (p.stock <= 5) {
                     stockBadgeClass = 'badge-warning';
                     stockLabel = 'Low Stock';
                     stockText = `Low Stock (${p.stock})`;
@@ -1330,6 +1572,13 @@
                     </div>
 
                     <div class="card-actions">
+                        <button class="btn-action" title="View Details" onclick="openProductDetailModal('${p.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Details
+                        </button>
                         <button class="btn-action edit" title="Edit Product" onclick="openEditModal('${p.id}')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -1366,6 +1615,13 @@
                     <td class="text-muted">${p.dateAdded || 'Recent'}</td>
                     <td class="text-right">
                         <div class="table-actions">
+                            <button class="btn-action" title="View Details" onclick="openProductDetailModal('${p.id}')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Details
+                            </button>
                             <button class="btn-action edit" title="Edit Product" onclick="openEditModal('${p.id}')">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
@@ -1388,22 +1644,27 @@
         }
 
         // Product Delete
-        function deleteProduct(id) {
-            const p = products.find(prod => prod.id === id);
-            if (!p) return;
+        async function deleteProduct(id) {
+            const listToSearch = currentUser.role === 'Supplier' ? myProducts : products;
+            const p = listToSearch.find(prod => prod.id === id);
+            const title = p ? p.title : 'product';
 
-            if (confirm(`Are you sure you want to delete "${p.title}"? This action cannot be undone.`)) {
-                products = products.filter(prod => prod.id !== id);
-                saveProducts();
-                renderHomeProducts();
-                renderProducts();
-                showToast(`Product deleted.`);
+            if (confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+                try {
+                    await apiFetch(`/products/${id}`, { method: 'DELETE' });
+                    showToast(`Product deleted.`);
+                    await fetchProducts();
+                    if (currentUser.role === 'Supplier') await fetchMyProducts();
+                } catch (err) {
+                    alert(`Failed to delete product: ${err.message}`);
+                }
             }
         }
 
         // Product Edit Modal Logic
         function openEditModal(id) {
-            const p = products.find(prod => prod.id === id);
+            const listToSearch = currentUser.role === 'Supplier' ? myProducts : products;
+            const p = listToSearch.find(prod => prod.id === id);
             if (!p) return;
 
             document.getElementById('edit-product-id').value = p.id;
@@ -1425,25 +1686,31 @@
             document.getElementById('edit-modal').classList.add('hidden');
         }
 
-        function handleSaveEditProduct(e) {
+        async function handleSaveEditProduct(e) {
             e.preventDefault();
             const id = document.getElementById('edit-product-id').value;
-            const pIndex = products.findIndex(prod => prod.id === id);
-            if (pIndex === -1) return;
+            const title = document.getElementById('edit-product-name').value.trim();
+            const category = document.getElementById('edit-product-category').value;
+            const price = parseFloat(document.getElementById('edit-product-price').value);
+            const stock = parseInt(document.getElementById('edit-product-stock').value, 10);
+            const sizes = document.getElementById('edit-product-sizes').value.trim();
+            const image = document.getElementById('edit-product-image').value.trim();
+            const description = document.getElementById('edit-product-description').value.trim();
 
-            products[pIndex].title = document.getElementById('edit-product-name').value.trim();
-            products[pIndex].category = document.getElementById('edit-product-category').value;
-            products[pIndex].price = parseFloat(document.getElementById('edit-product-price').value);
-            products[pIndex].stock = parseInt(document.getElementById('edit-product-stock').value, 10);
-            products[pIndex].sizes = document.getElementById('edit-product-sizes').value.trim();
-            products[pIndex].image = document.getElementById('edit-product-image').value.trim();
-            products[pIndex].description = document.getElementById('edit-product-description').value.trim();
+            try {
+                await apiFetch(`/products/${id}`, {
+                    method: 'PUT',
+                    body: { title, category, price, stock, sizes, image, description }
+                });
 
-            saveProducts();
-            closeEditModal();
-            renderHomeProducts();
-            renderProducts();
-            showToast(`Updated "${products[pIndex].title}" details.`);
+                closeEditModal();
+                showToast(`Updated "${title}" details.`);
+
+                await fetchProducts();
+                if (currentUser.role === 'Supplier') await fetchMyProducts();
+            } catch (err) {
+                alert(`Failed to update product: ${err.message}`);
+            }
         }
 
         // Tab 3 (Dashboard): Seller Orders Management
@@ -1458,14 +1725,14 @@
             let transitCount = 0;
             let totalRevenue = 0;
 
-            orders.forEach(o => {
+            sellerOrders.forEach(o => {
                 if (o.status === 'Pending') pendingCount++;
                 if (o.status === 'Processing' || o.status === 'Shipped') transitCount++;
                 if (o.status !== 'Cancelled') totalRevenue += o.totalPrice;
             });
 
             const totalEl = document.getElementById('metric-total-orders');
-            if (totalEl) totalEl.textContent = orders.length;
+            if (totalEl) totalEl.textContent = sellerOrders.length;
             const pendingEl = document.getElementById('metric-pending-orders');
             if (pendingEl) pendingEl.textContent = pendingCount;
             const transitEl = document.getElementById('metric-transit-orders');
@@ -1473,10 +1740,10 @@
             const revenueEl = document.getElementById('metric-total-revenue');
             if (revenueEl) revenueEl.textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
 
-            const filtered = orders.filter(o => {
+            const filtered = sellerOrders.filter(o => {
                 const matchesSearch = o.id.toLowerCase().includes(searchQuery) ||
-                                     o.customerName.toLowerCase().includes(searchQuery) ||
-                                     o.productName.toLowerCase().includes(searchQuery);
+                                     (o.customerName && o.customerName.toLowerCase().includes(searchQuery)) ||
+                                     (o.productName && o.productName.toLowerCase().includes(searchQuery));
                 const matchesStatus = (filterStatus === 'ALL' || o.status === filterStatus);
                 return matchesSearch && matchesStatus;
             });
@@ -1530,34 +1797,30 @@
             });
         }
 
-        function updateOrderStatus(orderId, newStatus) {
-            const o = orders.find(ord => ord.id === orderId);
-            if (!o) return;
-
-            const oldStatus = o.status;
-            o.status = newStatus;
-            saveOrders();
-
-            const dashOrdersView = document.getElementById('tab-dash-orders');
-            if (dashOrdersView && dashOrdersView.classList.contains('active')) {
-                renderDashOrders();
+        async function updateOrderStatus(orderId, newStatus) {
+            try {
+                await apiFetch(`/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    body: { status: newStatus }
+                });
+                showToast(`Order status changed to ${newStatus}`);
+                await fetchSellerOrders();
+            } catch (err) {
+                alert(`Failed to update status: ${err.message}`);
             }
-            renderOrders();
-
-            showToast(`Order ${orderId} status changed: ${oldStatus} ➔ ${newStatus}`);
         }
 
-        // Customer Store Orders — Read-only Order Status Tracker
+        // Customer Store Orders — Read-only Order Status Tracker (User's Purchase History)
         function renderOrders() {
             const grid = document.getElementById('orders-tracker-grid');
             const emptyState = document.getElementById('no-orders-empty');
             const searchQuery = document.getElementById('order-search').value.toLowerCase();
             const filterStatus = document.getElementById('order-filter-status').value;
 
-            const filtered = orders.filter(o => {
+            const filtered = myBuyerOrders.filter(o => {
                 const matchesSearch = o.id.toLowerCase().includes(searchQuery) ||
-                                     o.customerName.toLowerCase().includes(searchQuery) ||
-                                     o.productName.toLowerCase().includes(searchQuery);
+                                     (o.customerName && o.customerName.toLowerCase().includes(searchQuery)) ||
+                                     (o.productName && o.productName.toLowerCase().includes(searchQuery));
                 const matchesStatus = (filterStatus === 'ALL' || o.status === filterStatus);
                 return matchesSearch && matchesStatus;
             });
@@ -1596,7 +1859,7 @@
                     <div class="order-tracker-body">
                         <div class="order-tracker-detail">
                             <span class="order-tracker-label">Product Item</span>
-                            <span class="order-tracker-val">${o.productName} (Qty: ${o.quantity})</span>
+                            <span class="order-tracker-val">${o.productName}</span>
                         </div>
                         <div class="order-tracker-detail">
                             <span class="order-tracker-label">Customer</span>
@@ -1617,12 +1880,15 @@
         }
 
         // Initialize state on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateBadges();
-            renderHomeProducts();
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupUserProfile();
+            await fetchProducts();
+            await fetchMyBuyerOrders();
+            if (currentUser && currentUser.role === 'Supplier') {
+                await fetchMyProducts();
+                await fetchSellerOrders();
+            }
             renderCart();
-            renderProducts();
-            renderOrders();
         });
     </script>
 </body>

@@ -39,28 +39,29 @@
         function render() {
             container.innerHTML = `
                 <h2 class="auth-title">${isLogin ? 'Login to your account' : 'Create new account'}</h2>
+                <div id="auth-error-msg"></div>
                 <form class="auth-form" onsubmit="handleAuthSubmit(event)">
                     ${!isLogin ? `
                         <div>
-                            <label class="field-label">Name</label>
-                            <input type="text" class="field-input" required>
+                            <label class="field-label" for="auth-name">Name</label>
+                            <input type="text" id="auth-name" class="field-input" placeholder="e.g. John Doe" required>
                         </div>` : ''}
                     <div>
-                        <label class="field-label">Email Address</label>
-                        <input type="email" class="field-input" required>
+                        <label class="field-label" for="auth-email">Email Address</label>
+                        <input type="email" id="auth-email" class="field-input" placeholder="e.g. user@example.com" required>
                     </div>
                     <div>
-                        <label class="field-label">Password</label>
-                        <input type="password" class="field-input" required>
+                        <label class="field-label" for="auth-password">Password</label>
+                        <input type="password" id="auth-password" class="field-input" placeholder="••••••••" required minlength="6">
                     </div>
                     ${!isLogin ? `
                         <div class="role-group">
                             <label class="role-group-label">Signing As</label>
-                            <label class="role-option"><input type="radio" name="role" checked> Buyer</label>
-                            <label class="role-option"><input type="radio" name="role"> Supplier</label>
+                            <label class="role-option"><input type="radio" name="role" value="Buyer" checked> Buyer</label>
+                            <label class="role-option"><input type="radio" name="role" value="Supplier"> Supplier</label>
                         </div>` : ''}
                     
-                    <button type="submit" class="submit-btn">
+                    <button type="submit" id="auth-submit-btn" class="submit-btn">
                         ${isLogin ? 'LOGIN' : 'SIGN UP'}
                     </button>
                 </form>
@@ -78,9 +79,61 @@
             render();
         }
 
-        function handleAuthSubmit(e) {
+        async function handleAuthSubmit(e) {
             e.preventDefault();
-            window.location.href = 'homepage.html';
+            const errorEl = document.getElementById('auth-error-msg');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            errorEl.style.display = 'none';
+            errorEl.textContent = '';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
+            const API_BASE = 'http://localhost:5000/api/users';
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+
+            try {
+                let endpoint = isLogin ? `${API_BASE}/login` : `${API_BASE}/signup`;
+                let bodyData = { email, password };
+
+                if (!isLogin) {
+                    const name = document.getElementById('auth-name').value.trim();
+                    const role = document.querySelector('input[name="role"]:checked')?.value || 'Buyer';
+                    bodyData.name = name;
+                    bodyData.role = role;
+                }
+
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+
+                const contentType = res.headers.get('content-type') || '';
+                let data;
+                if (contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    const text = await res.text();
+                    throw new Error(`Server returned error (${res.status}): ${text.substring(0, 100)}`);
+                }
+
+                if (!res.ok) {
+                    throw new Error(data.message || 'Authentication failed');
+                }
+
+                // Store token & user profile
+                localStorage.setItem('glowstore_token', data.token);
+                localStorage.setItem('glowstore_user', JSON.stringify(data.user));
+
+                // Redirect to homepage
+                window.location.href = 'homepage.html';
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = isLogin ? 'LOGIN' : 'SIGN UP';
+            }
         }
 
         render();
