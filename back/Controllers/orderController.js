@@ -18,7 +18,7 @@ const createOrder = async (req, res) => {
         const groupedBySeller = new Map(); // sellerId -> [{ product, quantity }]
 
         for (const item of items) {
-            const { productId, quantity } = item;
+            const { productId, quantity, size } = item;
 
             if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
                 return res.status(400).json({ message: `Invalid product id: ${productId}` });
@@ -39,17 +39,18 @@ const createOrder = async (req, res) => {
             if (!groupedBySeller.has(sellerId)) {
                 groupedBySeller.set(sellerId, []);
             }
-            groupedBySeller.get(sellerId).push({ product, quantity });
+            groupedBySeller.get(sellerId).push({ product, quantity, size: size || '' });
         }
 
         // Create one order per seller
         const createdOrders = [];
 
         for (const [sellerId, sellerItems] of groupedBySeller.entries()) {
-            const orderItems = sellerItems.map(({ product, quantity }) => ({
+            const orderItems = sellerItems.map(({ product, quantity, size }) => ({
                 product: product._id,
                 productName: product.title,
                 quantity,
+                size: size || '',
                 price: product.price,
                 subtotal: product.price * quantity
             }));

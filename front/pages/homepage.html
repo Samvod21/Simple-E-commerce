@@ -706,7 +706,7 @@
         const currentUser = JSON.parse(localStorage.getItem('glowstore_user') || 'null');
 
         if (!token || !currentUser) {
-            window.location.href = 'authentication_pages.html';
+            window.location.href = 'authentication_pages.html?mode=login';
         }
 
         // Global State Variables (Data loaded dynamically from REST API)
@@ -721,7 +721,7 @@
         function handleLogout() {
             localStorage.removeItem('glowstore_token');
             localStorage.removeItem('glowstore_user');
-            window.location.href = 'authentication_pages.html';
+            window.location.href = 'authentication_pages.html?mode=login';
         }
 
         // Central API fetch helper attached with Bearer Token
@@ -814,7 +814,7 @@
             try {
                 const data = await apiFetch('/orders/mine');
                 myBuyerOrders = (data.orders || []).map(o => {
-                    const productNameSummary = o.items ? o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ') : 'Product';
+                    const productNameSummary = o.items ? o.items.map(i => `${i.productName}${i.size ? ' (Size: ' + i.size + ')' : ''} (x${i.quantity})`).join(', ') : 'Product';
                     const totalQty = o.items ? o.items.reduce((sum, i) => sum + i.quantity, 0) : 1;
                     return {
                         ...o,
@@ -838,7 +838,7 @@
             try {
                 const data = await apiFetch('/orders/seller');
                 sellerOrders = (data.orders || []).map(o => {
-                    const productNameSummary = o.items ? o.items.map(i => `${i.productName} (x${i.quantity})`).join(', ') : 'Product';
+                    const productNameSummary = o.items ? o.items.map(i => `${i.productName}${i.size ? ' (Size: ' + i.size + ')' : ''} (x${i.quantity})`).join(', ') : 'Product';
                     const totalQty = o.items ? o.items.reduce((sum, i) => sum + i.quantity, 0) : 1;
                     return {
                         ...o,
@@ -1256,7 +1256,12 @@
                         <img src="${item.image}" alt="${item.title}" class="cart-item-img" onerror="this.src='https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80'">
                         <div class="cart-item-info">
                             <h4 class="cart-item-title">${item.title}</h4>
-                            ${item.size ? `<span class="size-pill">Size: ${item.size}</span>` : ''}
+                            <div style="margin-top: 0.2rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.3rem;">
+                                <span style="font-size: 0.725rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Size:</span>
+                                <span style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #ffffff; font-size: 0.75rem; font-weight: 800; padding: 0.12rem 0.55rem; border-radius: 0.35rem; box-shadow: 0 1px 4px rgba(37,99,235,0.25);">
+                                    ${item.size ? item.size : 'Standard'}
+                                </span>
+                            </div>
                             <span class="cart-item-price">₹${item.price.toLocaleString('en-IN')} each</span>
                         </div>
                     </div>
@@ -1328,8 +1333,13 @@
                 const row = document.createElement('div');
                 row.className = 'summary-row margin-top-xs';
                 row.innerHTML = `
-                    <span><strong>${item.quantity}x</strong> ${item.title} ${item.size ? '(' + item.size + ')' : ''}</span>
-                    <span>₹${itemTotal.toLocaleString('en-IN')}</span>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                        <strong>${item.quantity}x</strong> ${item.title}
+                        <span style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #ffffff; font-size: 0.725rem; font-weight: 800; padding: 0.1rem 0.5rem; border-radius: 0.3rem;">
+                            Size: ${item.size ? item.size : 'Standard'}
+                        </span>
+                    </div>
+                    <span class="font-weight-bold">₹${itemTotal.toLocaleString('en-IN')}</span>
                 `;
                 summaryList.appendChild(row);
             });
@@ -1358,7 +1368,8 @@
 
             const orderItems = cart.map(item => ({
                 productId: item.id,
-                quantity: item.quantity
+                quantity: item.quantity,
+                size: item.size || ''
             }));
 
             try {
@@ -1766,6 +1777,24 @@
                 if (o.status === 'Delivered') badgeClass = 'badge-success';
                 if (o.status === 'Cancelled') badgeClass = 'badge-danger';
 
+                const itemsHtml = (o.items && o.items.length > 0)
+                    ? o.items.map(i => `
+                        <div class="dash-order-item-box" style="margin-bottom: 0.4rem; padding: 0.5rem 0.75rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 0.5rem; width: 100%;">
+                            <div style="font-weight: 700; color: #0f172a; font-size: 0.9rem;">${i.productName}</div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.3rem; flex-wrap: wrap;">
+                                <span style="font-size: 0.725rem; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Size / Variant:</span>
+                                <span style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #ffffff; font-size: 0.8rem; font-weight: 800; padding: 0.15rem 0.65rem; border-radius: 0.35rem; box-shadow: 0 2px 5px rgba(37,99,235,0.3); display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    </svg>
+                                    ${i.size ? i.size : 'Standard / No Size'}
+                                </span>
+                                <span style="font-size: 0.825rem; color: #334155; font-weight: 600; margin-left: 0.3rem;">Qty: <strong>${i.quantity}</strong></span>
+                            </div>
+                        </div>
+                    `).join('')
+                    : `<div>${o.productName}</div>`;
+
                 tr.innerHTML = `
                     <td>
                         <strong class="order-id-code">${o.id}</strong>
@@ -1775,9 +1804,8 @@
                         <div class="font-weight-bold">${o.customerName}</div>
                         <div class="text-xs text-muted">${o.location}</div>
                     </td>
-                    <td>
-                        <div>${o.productName}</div>
-                        <div class="text-xs text-muted">Qty: <strong>${o.quantity}</strong></div>
+                    <td style="min-width: 240px;">
+                        ${itemsHtml}
                     </td>
                     <td class="font-weight-bold">₹${o.totalPrice.toLocaleString('en-IN')}</td>
                     <td>
@@ -1843,6 +1871,24 @@
                 if (o.status === 'Delivered') badgeClass = 'badge-success';
                 if (o.status === 'Cancelled') badgeClass = 'badge-danger';
 
+                const itemsHtml = (o.items && o.items.length > 0)
+                    ? o.items.map(i => `
+                        <div class="tracker-item-box" style="margin-top: 0.4rem; padding: 0.5rem 0.75rem; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 0.5rem; width: 100%;">
+                            <div style="font-weight: 700; color: #0f172a; font-size: 0.9rem;">${i.productName}</div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.3rem; flex-wrap: wrap;">
+                                <span style="font-size: 0.725rem; color: #475569; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">Size / Variant:</span>
+                                <span style="background: linear-gradient(135deg, #1d4ed8, #2563eb); color: #ffffff; font-size: 0.8rem; font-weight: 800; padding: 0.15rem 0.65rem; border-radius: 0.35rem; box-shadow: 0 2px 5px rgba(37,99,235,0.3); display: inline-flex; align-items: center; gap: 0.25rem;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12">
+                                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                                    </svg>
+                                    ${i.size ? i.size : 'Standard / No Size'}
+                                </span>
+                                <span style="font-size: 0.825rem; color: #334155; font-weight: 600; margin-left: 0.3rem;">Qty: <strong>${i.quantity}</strong></span>
+                            </div>
+                        </div>
+                    `).join('')
+                    : `<span class="order-tracker-val">${o.productName}</span>`;
+
                 const card = document.createElement('div');
                 card.className = 'order-tracker-card';
                 card.innerHTML = `
@@ -1857,9 +1903,9 @@
                     </div>
 
                     <div class="order-tracker-body">
-                        <div class="order-tracker-detail">
-                            <span class="order-tracker-label">Product Item</span>
-                            <span class="order-tracker-val">${o.productName}</span>
+                        <div class="order-tracker-detail" style="flex-direction: column; align-items: flex-start;">
+                            <span class="order-tracker-label">Product Item(s)</span>
+                            ${itemsHtml}
                         </div>
                         <div class="order-tracker-detail">
                             <span class="order-tracker-label">Customer</span>

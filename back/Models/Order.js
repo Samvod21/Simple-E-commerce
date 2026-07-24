@@ -18,6 +18,11 @@ const orderItemSchema = new mongoose.Schema({
         min: [1, 'Quantity must be at least 1'],
         default: 1
     },
+    size: {
+        type: String,
+        trim: true,
+        default: ''
+    },
     price: {
         type: Number,
         required: [true, 'Unit price is required'],

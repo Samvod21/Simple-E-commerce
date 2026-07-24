@@ -10,13 +10,108 @@
 
     <!-- Left side: Branding & Info -->
     <div class="brand-panel">
-        <h1>Get all your buying problems solved today</h1>
-        <p>Join GlowStore and get connected to different suppliers across the globe</p>
+        <div class="brand-content">
+            <div class="brand-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                GlowStore B2B & B2C Marketplace
+            </div>
+            <h1>Get all your buying & selling solved today</h1>
+            <p>Join GlowStore to connect directly with trusted suppliers, track orders in real-time, and scale your business effortlessly.</p>
+        </div>
+        
         <div class="brand-icon-wrap">
-            <svg class="brand-icon" viewBox="0 0 100 100" fill="currentColor">
-                <circle cx="50" cy="50" r="40" stroke="white" stroke-width="2" fill="none"/>
-                <path d="M50 10 v80 M10 50 h80" stroke="white" stroke-width="1"/>
+            <svg class="brand-icon" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bgGlow" x1="0" y1="0" x2="400" y2="400" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+                        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+                    </linearGradient>
+                    <linearGradient id="bagGrad" x1="120" y1="120" x2="280" y2="340" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#ffffff"/>
+                        <stop offset="100%" stop-color="#f1f5f9"/>
+                    </linearGradient>
+                    <filter id="shadow" x="0" y="0" width="400" height="400" filterUnits="userSpaceOnUse">
+                        <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.25"/>
+                    </filter>
+                </defs>
+
+                <!-- Background Glow Ring -->
+                <circle cx="200" cy="200" r="170" fill="url(#bgGlow)" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-dasharray="6 6"/>
+                <circle cx="200" cy="200" r="130" fill="rgba(255,255,255,0.08)"/>
+
+                <!-- Shopping Bag Base -->
+                <g filter="url(#shadow)">
+                    <!-- Bag Handles -->
+                    <path d="M150 140 V105 C150 78 250 78 250 105 V140" stroke="#ffffff" stroke-width="14" stroke-linecap="round" fill="none"/>
+                    <path d="M150 140 V105 C150 78 250 78 250 105 V140" stroke="#1d4ed8" stroke-width="7" stroke-linecap="round" fill="none"/>
+
+                    <!-- Main Bag Body -->
+                    <rect x="110" y="140" width="180" height="190" rx="24" fill="url(#bagGrad)"/>
+                    <path d="M110 185 H290" stroke="#cbd5e1" stroke-width="2"/>
+
+                    <!-- Store Emblem Circle -->
+                    <circle cx="200" cy="235" r="38" fill="#1d4ed8"/>
+                    <!-- Shopping Cart Icon inside Emblem -->
+                    <path d="M183 226h7l6 18h17l5-13h-23" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="197" cy="249" r="3" fill="#ffffff"/>
+                    <circle cx="212" cy="249" r="3" fill="#ffffff"/>
+                </g>
+
+                <!-- Floating Package Box Badge (Top Right) -->
+                <g filter="url(#shadow)" transform="translate(250, 85)">
+                    <rect x="0" y="0" width="85" height="75" rx="16" fill="#ffffff"/>
+                    <path d="M17 24 L42 12 L67 24 L42 36 Z" fill="#38bdf8"/>
+                    <path d="M17 24 L42 36 V60 L17 48 Z" fill="#2563eb"/>
+                    <path d="M67 24 L42 36 V60 L67 48 Z" fill="#1d4ed8"/>
+                    <path d="M37 14 L47 19" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                </g>
+
+                <!-- Floating Verified Shield Badge (Top Left) -->
+                <g filter="url(#shadow)" transform="translate(60, 110)">
+                    <circle cx="28" cy="28" r="28" fill="#10b981"/>
+                    <path d="M18 28l7 7 15-15" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                </g>
+
+                <!-- Floating Price Tag Badge (Bottom Right) -->
+                <g filter="url(#shadow)" transform="translate(260, 275)">
+                    <rect x="0" y="0" width="85" height="46" rx="12" fill="#0284c7"/>
+                    <text x="42.5" y="28" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle" font-family="sans-serif">₹ STORE</text>
+                </g>
+
+                <!-- Floating Stars & Sparkles -->
+                <path d="M95 65 L100 78 L113 83 L100 88 L95 101 L90 88 L77 83 L90 78 Z" fill="#ffffff" opacity="0.95"/>
+                <path d="M325 210 L328 217 L335 220 L328 223 L325 230 L322 223 L315 220 L322 217 Z" fill="#38bdf8" opacity="0.95"/>
+                <circle cx="85" cy="275" r="4.5" fill="#ffffff" opacity="0.8"/>
+                <circle cx="315" cy="170" r="5" fill="#ffffff" opacity="0.85"/>
             </svg>
+        </div>
+
+        <div class="brand-features">
+            <div class="feature-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                Verified Suppliers
+            </div>
+            <div class="feature-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <rect x="1" y="3" width="15" height="13"/>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                    <circle cx="5.5" cy="18.5" r="2.5"/>
+                    <circle cx="18.5" cy="18.5" r="2.5"/>
+                </svg>
+                Fast Delivery
+            </div>
+            <div class="feature-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                100% Secure
+            </div>
         </div>
     </div>
 
@@ -34,7 +129,9 @@
 
     <script>
         const container = document.getElementById('auth-container');
-        let isLogin = false;
+        const urlParams = new URLSearchParams(window.location.search);
+        const modeParam = urlParams.get('mode');
+        let isLogin = modeParam ? (modeParam === 'login') : true;
 
         function render() {
             container.innerHTML = `

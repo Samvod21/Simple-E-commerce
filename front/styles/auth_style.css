@@ -20,38 +20,87 @@ body {
 
 .brand-panel {
     width: 100%;
-    background: linear-gradient(to bottom right, #1d4ed8, #3b82f6); /* blue-700 -> blue-500 */
-    padding: 2rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1d4ed8 100%);
+    padding: 3rem 2.5rem;
     color: #ffffff;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #38bdf8;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.85rem;
+    border-radius: 2rem;
+    margin-bottom: 1.25rem;
 }
 
 .brand-panel h1 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-    font-weight: 700;
+    font-size: 2.15rem;
+    line-height: 1.25;
+    font-weight: 800;
     margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
 }
 
 .brand-panel p {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-    opacity: 0.9;
-    margin: 0 0 2rem 0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin: 0 0 1.5rem 0;
 }
 
 .brand-icon-wrap {
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
     display: flex;
     justify-content: center;
+    align-items: center;
 }
 
 .brand-icon {
-    width: 12rem;
-    height: 12rem;
-    opacity: 0.8;
+    width: 17rem;
+    height: 17rem;
+    max-width: 100%;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.brand-icon:hover {
+    transform: scale(1.03);
+}
+
+.brand-features {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.4rem 0.85rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #f1f5f9;
 }
 
 /* ---------- Right panel: Auth form ---------- */
